@@ -53,7 +53,7 @@ main{overflow-y:auto;min-height:0;position:relative}
 .mainhead h2{margin:3px 0 0;font-size:21px;font-weight:800;line-height:1.15;text-wrap:balance}
 .mainhead .unum{font-family:var(--mono);font-size:13px;color:var(--accent-ink);margin-top:3px;word-break:break-all}
 .toolbtn{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
-.toolbtn button{background:var(--surface);border:1px solid var(--line);border-radius:7px;color:var(--muted);cursor:pointer;padding:8px 11px;font-size:13px;font-family:var(--sans);white-space:nowrap}
+.toolbtn button{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:7px;color:var(--muted);cursor:pointer;padding:8px 11px;font-size:13px;font-family:var(--sans);white-space:nowrap}
 .toolbtn button:hover{border-color:var(--accent);color:var(--ink)}
 .menubtn{display:none}
 .plates{padding:20px 26px 80px;display:flex;flex-direction:column;gap:26px;max-width:1500px}
@@ -77,6 +77,10 @@ td.pos b{display:inline-block;min-width:22px;padding:1px 5px;border:1.5px solid 
 td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;font-size:12.5px;cursor:copy}
 td.num:hover{color:var(--accent-ink)}
 td.qty{text-align:center;font-variant-numeric:tabular-nums;width:1%;color:var(--muted)}
+th.chk,td.chk{width:1%;text-align:center;padding-left:10px;padding-right:4px}
+.rowchk,.selall{width:16px;height:16px;cursor:pointer;accent-color:var(--accent)}
+tbody tr.incart{background:var(--accent-soft)}
+.badge{position:absolute;top:-6px;right:-6px;background:var(--accent);color:#fff;border-radius:999px;font-size:10.5px;font-weight:800;min-width:16px;height:16px;line-height:16px;text-align:center;padding:0 3px;font-variant-numeric:tabular-nums}
 .norows{padding:22px;color:var(--faint);text-align:center;font-size:13px}
 .scrim{display:none}
 .results{position:absolute;left:14px;right:14px;top:calc(100% - 6px);background:var(--surface);border:1px solid var(--line);border-radius:9px;box-shadow:0 12px 30px rgba(0,0,0,.25);max-height:60vh;overflow-y:auto;z-index:40;display:none}
@@ -98,6 +102,37 @@ td.qty{text-align:center;font-variant-numeric:tabular-nums;width:1%;color:var(--
 .lbnav.show{display:block}
 #lbprev{left:12px}#lbnext{right:12px}
 .lbhint{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);color:#cfd4da;font-size:12px;z-index:110;text-align:center}
+.cartscrim{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:75;display:none}
+.cartscrim.show{display:block}
+.cartdrawer{position:fixed;top:0;right:0;bottom:0;width:min(94vw,460px);background:var(--surface);z-index:80;box-shadow:-10px 0 34px rgba(0,0,0,.28);transform:translateX(105%);transition:transform .22s;display:flex;flex-direction:column}
+.cartdrawer.show{transform:none}
+.cdhead{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.cdhead h3{margin:0;font-size:16px;font-weight:800;flex:1}
+.cdcount{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.cdhead button{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;padding:2px 4px}
+.cdhead button:hover{color:var(--ink)}
+.cdlist{flex:1;overflow-y:auto;padding:8px 14px}
+.cggroup{margin-bottom:14px}
+.cghead{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:8px 4px 6px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.cgnum{font-family:var(--mono);color:var(--accent-ink);text-transform:none;letter-spacing:0}
+.citem{display:flex;align-items:flex-start;gap:8px;padding:8px 4px;border-radius:8px}
+.citem:hover{background:var(--surface-2)}
+.cimain{flex:1;min-width:0;cursor:pointer}
+.cinum{font-family:var(--mono);font-size:12px;color:var(--accent-ink)}
+.ciname{font-size:13px;margin-top:2px}
+.ciqty{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0}
+.ciqty label{font-size:9.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em}
+.cistepper{display:flex;align-items:stretch;gap:3px}
+.cistepper button{width:22px;border:1px solid var(--line);border-radius:6px;background:var(--surface-2);color:var(--muted);font-size:14px;font-weight:700;cursor:pointer;line-height:1;padding:0}
+.cistepper button:hover{border-color:var(--accent);color:var(--accent-ink)}
+.ciqty input{width:40px;padding:4px 2px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);font-size:13px;text-align:center;font-variant-numeric:tabular-nums}
+.cirm{flex-shrink:0;background:none;border:1px solid var(--line);border-radius:7px;color:var(--faint);width:26px;height:26px;cursor:pointer;font-size:16px;line-height:1}
+.cirm:hover{border-color:#c0392b;color:#c0392b}
+.cdfoot{display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px;border-top:1px solid var(--line)}
+.cdfoot button{flex:1 1 auto;min-width:100px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);font-size:12.5px;font-weight:600;cursor:pointer}
+.cdfoot button:hover{border-color:var(--accent);color:var(--accent-ink)}
+#cartclear:hover{border-color:#c0392b;color:#c0392b}
+@media(max-width:480px){.cartdrawer{width:100vw}}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--steel);color:#fff;padding:10px 18px;border-radius:9px;font-size:13.5px;z-index:200;opacity:0;transition:.25s;pointer-events:none;max-width:88vw}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 @media(max-width:900px){
@@ -111,7 +146,7 @@ td.qty{text-align:center;font-variant-numeric:tabular-nums;width:1%;color:var(--
  .scrim.show{display:block}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
-@media print{aside,.toolbtn,.searchbox,.lb,.toast{display:none!important}.app{display:block;height:auto}main{overflow:visible}.plate .body{grid-template-columns:1fr}}
+@media print{aside,.toolbtn,.searchbox,.lb,.toast,.cartscrim,.cartdrawer,th.chk,td.chk{display:none!important}.app{display:block;height:auto}main{overflow:visible}.plate .body{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -142,6 +177,7 @@ td.qty{text-align:center;font-variant-numeric:tabular-nums;width:1%;color:var(--
     <div class="toolbtn">
       <button id="prevu" title="Предыдущий узел (←)">‹</button>
       <button id="nextu" title="Следующий узел (→)">›</button>
+      <button id="cartbtn" title="Корзина деталей (c)">🛒<span class="badge" id="cartbadge" hidden>0</span></button>
       <button id="csvbtn" title="Скачать спецификацию узла в CSV">⬇ CSV</button>
       <button id="themebtn" title="Светлая/тёмная тема">◐</button>
     </div>
@@ -159,6 +195,17 @@ td.qty{text-align:center;font-variant-numeric:tabular-nums;width:1%;color:var(--
   <img id="lbimg" alt="Чертёж крупно">
   <div class="lbhint">Колесо — масштаб · перетаскивание — сдвиг · двойной клик — сброс · Esc — закрыть</div>
 </div>
+<div class="cartscrim" id="cartscrim"></div>
+<div class="cartdrawer" id="cartdrawer">
+  <div class="cdhead"><h3>Корзина деталей</h3><span class="cdcount" id="cdcount"></span><button id="cartclose" title="Закрыть (Esc)">×</button></div>
+  <div class="cdlist" id="cdlist"></div>
+  <div class="cdfoot">
+    <button id="cartclear">Очистить</button>
+    <button id="cartcopy">Скопировать список</button>
+    <button id="cartcsv">⬇ CSV</button>
+    <button id="cartxls">⬇ Excel</button>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 <noscript><p style="padding:30px">Для работы каталога включите JavaScript.</p></noscript>
 <script src="data.js"></script>
@@ -168,6 +215,10 @@ td.qty{text-align:center;font-variant-numeric:tabular-nums;width:1%;color:var(--
 if(!window.CATALOG){document.body.innerHTML='<p style="padding:30px">Файл data.js не найден — выполните сборку: python3 tools/build_catalog.py …</p>';return;}
 var C=window.CATALOG, ORDER=C.order;
 var st={eq:ORDER[0],u:0};
+var CART={};
+try{CART=JSON.parse(localStorage.getItem('kmz.cart')||'{}');}catch(e){CART={};}
+function saveCart(){try{localStorage.setItem('kmz.cart',JSON.stringify(CART));}catch(e){}}
+function labelOf(eqid){return (C.equip[eqid]&&C.equip[eqid].label)||eqid;}
 var esc=function(s){return (s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
 var $=function(id){return document.getElementById(id);};
 /* автономная сборка встраивает чертежи как data: URI в window.CATALOG_ASSETS;
@@ -217,11 +268,19 @@ function renderUnitList(filter){
 }
 
 /* ---------- основная область ---------- */
-function rowsTable(rows,hlPos){
+function rowsTable(rows,hlPos,ctx){
   if(!rows.length)return '<div class="norows">На этом листе — только чертёж (без спецификации)</div>';
-  var h='<div class="tblwrap"><table><thead><tr><th>Поз.</th><th>Идент. номер</th><th>Наименование</th><th>Кол-во</th></tr></thead><tbody>';
+  var h='<div class="tblwrap"><table><thead><tr><th class="chk"><input type="checkbox" class="selall" title="Выбрать все на листе"></th>'+
+        '<th>Поз.</th><th>Идент. номер</th><th>Наименование</th><th>Кол-во</th></tr></thead><tbody>';
   rows.forEach(function(r){
-    h+='<tr'+(hlPos&&r.pos===hlPos?' class="hit"':'')+'><td class="pos">'+(r.pos?'<b>'+esc(r.pos)+'</b>':'')+'</td>'+
+    var key=ctx.eq+'::'+ctx.ui+'::'+ctx.pi+'::'+r.pos+'::'+r.num;
+    var inCart=!!CART[key];
+    var cls=[];if(hlPos&&r.pos===hlPos)cls.push('hit');if(inCart)cls.push('incart');
+    h+='<tr'+(cls.length?' class="'+cls.join(' ')+'"':'')+'>'+
+       '<td class="chk"><input type="checkbox" class="rowchk" data-key="'+key+'" '+(inCart?'checked':'')+
+         ' data-eq="'+ctx.eq+'" data-un="'+esc(ctx.unitName)+'" data-unum="'+esc(ctx.unitNum)+'"'+
+         ' data-pos="'+esc(r.pos)+'" data-num="'+esc(r.num)+'" data-name="'+esc(r.name)+'" data-qty="'+esc(r.qty)+'" data-pg="'+esc(ctx.pageLbl)+'"></td>'+
+       '<td class="pos">'+(r.pos?'<b>'+esc(r.pos)+'</b>':'')+'</td>'+
        '<td class="num" title="Клик — скопировать номер">'+esc(r.num)+'</td>'+
        '<td>'+(esc(r.name)||'<span style="color:var(--faint)">—</span>')+'</td>'+
        '<td class="qty">'+esc(r.qty)+'</td></tr>';});
@@ -239,12 +298,14 @@ function renderMain(hl){
       var gi=curImgs.length,src=resolveImg(im);curImgs.push(src);
       return '<img loading="lazy" src="'+src+'" data-gi="'+gi+'" alt="Чертёж '+lbl+'" '+
              'onerror="this.outerHTML=\'<div class=noimg>Изображение не найдено: '+esc(im)+'</div>\'">';}).join('');
+    var ctx={eq:st.eq,ui:st.u,pi:pi,unitName:u.name,unitNum:u.num||'',pageLbl:String(pl.ppspan[1])};
     h+='<div class="plate" id="plate-'+pi+'"><div class="phead"><span class="pnum">Лист · '+lbl+'</span>'+
        '<span class="pcount">'+pl.rows.length+' позиций</span></div>'+
-       '<div class="body"><div class="figs">'+figs+'</div>'+rowsTable(pl.rows,hl&&hl.pi===pi?hl.pos:null)+'</div></div>';});
+       '<div class="body"><div class="figs">'+figs+'</div>'+rowsTable(pl.rows,hl&&hl.pi===pi?hl.pos:null,ctx)+'</div></div>';});
   $('plates').innerHTML=h;
   $('plates').querySelectorAll('.figs img').forEach(function(img){img.onclick=function(){openLB(+img.dataset.gi);};});
   $('plates').querySelectorAll('td.num').forEach(function(td){td.onclick=function(){copyText(td.textContent);};});
+  bindCartCheckboxes();
   $('main').scrollTop=0;
   if(hl){var el=$('plate-'+hl.pi);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
 }
@@ -316,18 +377,171 @@ function exportCSV(){
   u.plates.forEach(function(pl){pl.rows.forEach(function(r){
     lines.push([r.pos,r.num,'"'+(r.name||'').replace(/"/g,'""')+'"',r.qty,pl.ppspan[1]].join(';'));});});
   var blob=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
-  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download=(C.equip[st.eq].label+'_'+u.name).replace(/[^\wа-яА-ЯёЁ()\- ]+/g,'_').slice(0,80)+'.csv';
-  document.body.appendChild(a);a.click();a.remove();
+  downloadBlob(blob,(C.equip[st.eq].label+'_'+u.name).replace(/[^\wа-яА-ЯёЁ()\- ]+/g,'_').slice(0,80)+'.csv');
   toast('Спецификация узла сохранена в CSV');
+}
+function downloadBlob(blob,name){
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
+  document.body.appendChild(a);a.click();a.remove();
+}
+
+/* ---------- корзина деталей ---------- */
+function updateCartBadge(){
+  var n=Object.keys(CART).length,b=$('cartbadge');
+  if(n>0){b.textContent=n;b.hidden=false;}else{b.hidden=true;}
+}
+function applyCartToggle(cb){
+  var key=cb.dataset.key;
+  if(cb.checked){
+    CART[key]={eq:cb.dataset.eq,unit:cb.dataset.un,unum:cb.dataset.unum,pos:cb.dataset.pos,num:cb.dataset.num,
+      name:cb.dataset.name,qty:cb.dataset.qty,pg:cb.dataset.pg,
+      orderQty:(CART[key]&&CART[key].orderQty)||cb.dataset.qty||'1'};
+  }else{delete CART[key];}
+  cb.closest('tr').classList.toggle('incart',cb.checked);
+}
+function updateSelAllState(hcb,table){
+  var boxes=[].slice.call(table.querySelectorAll('.rowchk'));
+  var n=boxes.filter(function(cb){return cb.checked;}).length;
+  hcb.checked=boxes.length>0&&n===boxes.length;
+  hcb.indeterminate=n>0&&n<boxes.length;
+}
+function bindCartCheckboxes(){
+  $('plates').querySelectorAll('table').forEach(function(table){
+    var hcb=table.querySelector('.selall');
+    if(!hcb)return;
+    updateSelAllState(hcb,table);
+    hcb.onchange=function(){
+      var checked=hcb.checked;
+      table.querySelectorAll('.rowchk').forEach(function(cb){if(cb.checked!==checked){cb.checked=checked;applyCartToggle(cb);}});
+      saveCart();updateCartBadge();
+    };
+  });
+  $('plates').querySelectorAll('.rowchk').forEach(function(cb){
+    cb.onchange=function(){
+      applyCartToggle(cb);saveCart();updateCartBadge();
+      var table=cb.closest('table'),h=table.querySelector('.selall');if(h)updateSelAllState(h,table);
+    };
+  });
+}
+function cartRows(){return Object.keys(CART).map(function(k){return CART[k];});}
+function renderCart(){
+  var keys=Object.keys(CART);
+  $('cdcount').textContent=keys.length+' поз.';
+  if(!keys.length){$('cdlist').innerHTML='<div class="norows">Корзина пуста. Отмечайте детали чекбоксами в таблицах спецификаций.</div>';return;}
+  var groups={},gorder=[];
+  keys.forEach(function(k){
+    var it=CART[k],gk=it.eq+'::'+it.unit+'::'+it.unum;
+    if(!groups[gk]){groups[gk]=[];gorder.push(gk);}
+    groups[gk].push({k:k,it:it});
+  });
+  var h='';
+  gorder.forEach(function(gk){
+    var arr=groups[gk],it0=arr[0].it;
+    h+='<div class="cggroup"><div class="cghead">'+esc(labelOf(it0.eq))+' · '+esc(it0.unit)+
+       (it0.unum?' <span class="cgnum">'+esc(it0.unum)+'</span>':'')+'</div>';
+    arr.forEach(function(row){
+      var it=row.it;
+      h+='<div class="citem" data-key="'+row.k+'">'+
+         '<div class="cimain">'+(it.pos?'<b>Поз. '+esc(it.pos)+'</b> · ':'')+'<span class="cinum">'+esc(it.num)+'</span>'+
+         '<div class="ciname">'+(esc(it.name)||'<span style="color:var(--faint)">—</span>')+'</div></div>'+
+         '<div class="ciqty"><label>Заказ</label><div class="cistepper"><button class="cidec" type="button" title="Меньше">−</button>'+
+         '<input type="number" min="1" step="1" class="ciorder" value="'+esc(it.orderQty||it.qty||'1')+'">'+
+         '<button class="ciinc" type="button" title="Больше">+</button></div></div>'+
+         '<button class="cirm" title="Убрать из корзины">×</button></div>';
+    });
+    h+='</div>';
+  });
+  $('cdlist').innerHTML=h;
+  $('cdlist').querySelectorAll('.citem').forEach(function(el){
+    var key=el.dataset.key,inp=el.querySelector('.ciorder');
+    function setQty(v){v=Math.max(1,v||1);inp.value=v;if(CART[key]){CART[key].orderQty=String(v);saveCart();}}
+    inp.addEventListener('input',function(e){if(CART[key]){CART[key].orderQty=e.target.value;saveCart();}});
+    inp.addEventListener('blur',function(){setQty(parseInt(inp.value,10));});
+    el.querySelector('.cidec').addEventListener('click',function(){setQty((parseInt(inp.value,10)||1)-1);});
+    el.querySelector('.ciinc').addEventListener('click',function(){setQty((parseInt(inp.value,10)||1)+1);});
+    el.querySelector('.cirm').addEventListener('click',function(){
+      delete CART[key];saveCart();updateCartBadge();renderCart();
+      var cb=document.querySelector('.rowchk[data-key="'+key+'"]');
+      if(cb){cb.checked=false;cb.closest('tr').classList.remove('incart');
+        var table=cb.closest('table'),h=table.querySelector('.selall');if(h)updateSelAllState(h,table);}
+    });
+    el.querySelector('.cimain').addEventListener('click',function(){goToCartItem(CART[key]);});
+  });
+}
+function goToCartItem(it){
+  var hit=null;
+  for(var i=0;i<IDX.length;i++){var x=IDX[i];if(x.eq===it.eq&&x.unit===it.unit&&x.pos===it.pos&&x.num===it.num){hit=x;break;}}
+  if(!hit)return;
+  closeCart();go(hit);
+}
+function openCart(){renderCart();$('cartdrawer').classList.add('show');$('cartscrim').classList.add('show');}
+function closeCart(){$('cartdrawer').classList.remove('show');$('cartscrim').classList.remove('show');}
+function csvField(s){return '"'+String(s==null?'':s).replace(/"/g,'""')+'"';}
+function exportCartCSV(){
+  var rows=cartRows();
+  if(!rows.length){toast('Корзина пуста');return;}
+  var lines=['Оборудование;Узел;Поз.;Идент. номер;Наименование;Кол-во;К заказу;Стр.'];
+  rows.forEach(function(it){
+    lines.push([csvField(labelOf(it.eq)),csvField(it.unit),it.pos,it.num,csvField(it.name),it.qty,(it.orderQty||it.qty||''),it.pg].join(';'));
+  });
+  var blob=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  downloadBlob(blob,'Корзина_запчастей.csv');
+  toast('CSV сохранён: '+rows.length+' поз.');
+}
+function xmlEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function exportCartXLS(){
+  var rows=cartRows();
+  if(!rows.length){toast('Корзина пуста');return;}
+  var head=['Оборудование','Узел','Поз.','Идент. номер','Наименование','Кол-во','К заказу','Стр.'];
+  var widths=[130,220,40,150,260,60,60,50];
+  var xml='<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?>'+
+    '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" '+
+    'xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">'+
+    '<Styles><Style ss:ID="hdr"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#2F4A63" ss:Pattern="Solid"/></Style>'+
+    '<Style ss:ID="txt"><NumberFormat ss:Format="@"/></Style></Styles>'+
+    '<Worksheet ss:Name="Корзина"><Table>'+
+    widths.map(function(w){return '<Column ss:Width="'+w+'"/>';}).join('')+
+    '<Row>'+head.map(function(hd){return '<Cell ss:StyleID="hdr"><Data ss:Type="String">'+xmlEsc(hd)+'</Data></Cell>';}).join('')+'</Row>';
+  rows.forEach(function(it){
+    xml+='<Row>'+
+      '<Cell><Data ss:Type="String">'+xmlEsc(labelOf(it.eq))+'</Data></Cell>'+
+      '<Cell><Data ss:Type="String">'+xmlEsc(it.unit)+'</Data></Cell>'+
+      '<Cell><Data ss:Type="String">'+xmlEsc(it.pos)+'</Data></Cell>'+
+      '<Cell ss:StyleID="txt"><Data ss:Type="String">'+xmlEsc(it.num)+'</Data></Cell>'+
+      '<Cell><Data ss:Type="String">'+xmlEsc(it.name)+'</Data></Cell>'+
+      '<Cell><Data ss:Type="String">'+xmlEsc(it.qty)+'</Data></Cell>'+
+      '<Cell><Data ss:Type="String">'+xmlEsc(it.orderQty||it.qty||'')+'</Data></Cell>'+
+      '<Cell><Data ss:Type="String">'+xmlEsc(it.pg)+'</Data></Cell>'+
+      '</Row>';
+  });
+  xml+='</Table></Worksheet></Workbook>';
+  var blob=new Blob([xml],{type:'application/vnd.ms-excel'});
+  downloadBlob(blob,'Корзина_запчастей.xls');
+  toast('Excel сохранён: '+rows.length+' поз.');
+}
+function copyCartText(){
+  var rows=cartRows();
+  if(!rows.length){toast('Корзина пуста');return;}
+  var lines=rows.map(function(it){
+    return (it.pos?'Поз. '+it.pos+' · ':'')+it.num+' — '+(it.name||'—')+' · '+labelOf(it.eq)+' / '+it.unit+' · заказ: '+(it.orderQty||it.qty||'');
+  });
+  copyText(lines.join('\n'),rows.length+' поз. скопировано в буфер');
+}
+function clearCart(){
+  var n=Object.keys(CART).length;
+  if(!n)return;
+  if(!confirm('Очистить корзину ('+n+' поз.)?'))return;
+  CART={};saveCart();updateCartBadge();renderCart();
+  $('plates').querySelectorAll('.rowchk').forEach(function(cb){cb.checked=false;cb.closest('tr').classList.remove('incart');});
+  $('plates').querySelectorAll('.selall').forEach(function(hcb){hcb.checked=false;hcb.indeterminate=false;});
 }
 
 /* ---------- утилиты ---------- */
 var toastT;
 function toast(msg){var t=$('toast');t.textContent=msg;t.classList.add('show');
   clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('show');},1800);}
-function copyText(s){
-  function ok(){toast('Скопировано: '+s);}
+function copyText(s,msg){
+  function ok(){toast(msg||('Скопировано: '+s));}
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(s).then(ok,function(){fallback();});}
   else fallback();
   function fallback(){var ta=document.createElement('textarea');ta.value=s;document.body.appendChild(ta);
@@ -338,7 +552,7 @@ function closeAside(){$('aside').classList.remove('open');$('scrim').classList.r
 /* ---------- клавиатура ---------- */
 document.addEventListener('keydown',function(e){
   var typing=/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
-  if(e.key==='Escape'){closeLB();$('results').classList.remove('show');closeAside();return;}
+  if(e.key==='Escape'){closeLB();closeCart();$('results').classList.remove('show');closeAside();return;}
   if(lb.classList.contains('show')){
     if(e.key==='ArrowLeft')lbStep(-1);
     if(e.key==='ArrowRight')lbStep(1);
@@ -348,6 +562,7 @@ document.addEventListener('keydown',function(e){
       var hits=$('results')._hits;if(hits&&hits.length)go(hits[0]);}
     return;}
   if(e.key==='/'){e.preventDefault();$('gsearch').focus();}
+  if(e.key==='c'){e.preventDefault();openCart();}
   if(e.key==='ArrowLeft')stepUnit(-1);
   if(e.key==='ArrowRight')stepUnit(1);
 });
@@ -366,13 +581,20 @@ $('prevu').onclick=function(){stepUnit(-1);};
 $('nextu').onclick=function(){stepUnit(1);};
 $('menubtn').onclick=function(){$('aside').classList.add('open');$('scrim').classList.add('show');};
 $('scrim').onclick=closeAside;
+$('cartbtn').onclick=openCart;
+$('cartclose').onclick=closeCart;
+$('cartscrim').onclick=closeCart;
+$('cartclear').onclick=clearCart;
+$('cartcopy').onclick=copyCartText;
+$('cartcsv').onclick=exportCartCSV;
+$('cartxls').onclick=exportCartXLS;
 window.addEventListener('hashchange',function(){if(readLoc()){renderTabs();renderUnitList('');renderMain();}});
 
 var tot=0,teq=ORDER.length;
 ORDER.forEach(function(eq){C.equip[eq].units.forEach(function(u){u.plates.forEach(function(p){tot+=p.rows.length;});});});
 $('sidefoot').innerHTML='Оборудования: '+teq+' · позиций: '+tot+'<br>Сборка: '+esc(C.generated)+' · генератор v'+esc(C.version);
 
-readLoc();renderTabs();renderUnitList('');renderMain();saveLoc();
+readLoc();renderTabs();renderUnitList('');renderMain();saveLoc();updateCartBadge();
 })();
 </script>
 </body>
