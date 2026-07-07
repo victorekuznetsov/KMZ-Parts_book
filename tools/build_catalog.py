@@ -336,8 +336,11 @@ def auto_title(doc, fallback):
         return fallback
 
 # ------------------------------------------------------------------ сборка -
-def write_outputs(outdir, manifest):
-    """data.js + index.html из шаблона."""
+def write_outputs(outdir, manifest, embed=True):
+    """data.js всегда; index.html — самодостаточный (чертежи встроены как data:-URI)
+    по умолчанию, чтобы обычный git clone/скачивание с GitHub сразу работали
+    без отдельного шага сборки. embed=False — быстрый режим для разработки:
+    index.html лишь ссылается на data.js/img/ рядом (не для распространения)."""
     build_dir = os.path.join(outdir, '.build')
     data = {'generated': datetime.date.today().isoformat(), 'version': VERSION,
             'order': manifest['order'], 'equip': {}}
@@ -351,7 +354,15 @@ def write_outputs(outdir, manifest):
     open(os.path.join(outdir, 'data.js'), 'w', encoding='utf-8').write(
         'window.CATALOG=' + js + ';')
     tpl = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'viewer.html')
-    shutil.copyfile(tpl, os.path.join(outdir, 'index.html'))
+    if embed:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import pack_standalone
+        out, mb, n, missing = pack_standalone.pack(outdir, os.path.join(outdir, 'index.html'), template=tpl)
+        if missing:
+            print(f'  ! предупреждение: {len(missing)} изображений не найдено при встраивании: {missing[:5]}…')
+        print(f'  index.html собран как самодостаточный файл ({mb:.1f} МБ, встроено {n} изображений)')
+    else:
+        shutil.copyfile(tpl, os.path.join(outdir, 'index.html'))
 
 def main():
     ap = argparse.ArgumentParser(description='Генератор интерактивного каталога запчастей из PDF')
@@ -367,6 +378,9 @@ def main():
     ap.add_argument('--force', action='store_true', help='пересобрать даже без изменений')
     ap.add_argument('--remove', metavar='ID', help='удалить оборудование из каталога')
     ap.add_argument('--list', action='store_true', help='показать собранные каталоги')
+    ap.add_argument('--no-embed', action='store_true',
+                    help='не встраивать чертежи в index.html (быстрый режим для разработки; '
+                         'НЕ для распространения -- index.html будет зависеть от соседних data.js/img/)')
     a = ap.parse_args()
 
     outdir = os.path.abspath(a.outdir)
@@ -395,7 +409,7 @@ def main():
         j = os.path.join(build_dir, f'{a.remove}.json')
         if os.path.exists(j): os.remove(j)
         json.dump(manifest, open(mpath, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-        write_outputs(outdir, manifest)
+        write_outputs(outdir, manifest, embed=not a.no_embed)
         print(f'Удалено: {a.remove}. Каталог пересобран.')
         return
 
@@ -455,7 +469,7 @@ def main():
                   f'({unnamed} без наименования), {rendered} изображений')
 
     json.dump(manifest, open(mpath, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    write_outputs(outdir, manifest)
+    write_outputs(outdir, manifest, embed=not a.no_embed)
     tot = sum(manifest['items'][e]['stats']['rows'] for e in manifest['order'])
     print(f'Готово: {outdir}/index.html | оборудования: {len(manifest["order"])} | позиций: {tot}')
 

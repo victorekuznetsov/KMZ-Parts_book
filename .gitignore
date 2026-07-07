@@ -1,3 +1,5 @@
 catalog_book/img/
+catalog_book/data.js
 catalog_book/.build/
 catalog_book_standalone.html
+__pycache__/
