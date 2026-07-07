@@ -170,6 +170,9 @@ var C=window.CATALOG, ORDER=C.order;
 var st={eq:ORDER[0],u:0};
 var esc=function(s){return (s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
 var $=function(id){return document.getElementById(id);};
+/* автономная сборка встраивает чертежи как data: URI в window.CATALOG_ASSETS;
+   обычная сборка держит их файлами рядом в img/ — резолвим и так, и так */
+var resolveImg=function(name){return (window.CATALOG_ASSETS&&window.CATALOG_ASSETS[name])||('img/'+name);};
 
 /* ---------- индекс поиска ---------- */
 var IDX=[];
@@ -233,9 +236,9 @@ function renderMain(hl){
   u.plates.forEach(function(pl,pi){
     var lbl=pl.ppspan[0]===pl.ppspan[1]?'Стр. '+pl.ppspan[0]:'Стр. '+pl.ppspan[0]+'–'+pl.ppspan[1];
     var figs=pl.imgs.map(function(im){
-      var gi=curImgs.length;curImgs.push('img/'+im);
-      return '<img loading="lazy" src="img/'+im+'" data-gi="'+gi+'" alt="Чертёж '+lbl+'" '+
-             'onerror="this.outerHTML=\'<div class=noimg>Изображение не найдено.<br>Выполните сборку: python3 tools/build_catalog.py … (см. README)</div>\'">';}).join('');
+      var gi=curImgs.length,src=resolveImg(im);curImgs.push(src);
+      return '<img loading="lazy" src="'+src+'" data-gi="'+gi+'" alt="Чертёж '+lbl+'" '+
+             'onerror="this.outerHTML=\'<div class=noimg>Изображение не найдено: '+esc(im)+'</div>\'">';}).join('');
     h+='<div class="plate" id="plate-'+pi+'"><div class="phead"><span class="pnum">Лист · '+lbl+'</span>'+
        '<span class="pcount">'+pl.rows.length+' позиций</span></div>'+
        '<div class="body"><div class="figs">'+figs+'</div>'+rowsTable(pl.rows,hl&&hl.pi===pi?hl.pos:null)+'</div></div>';});
