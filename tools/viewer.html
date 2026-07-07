@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Каталог запчастей — чертежи и спецификации</title>
+<style>
+:root{
+ --ground:#eceef1;--surface:#fff;--surface-2:#f5f7f9;--line:#d8dde3;
+ --ink:#1a1d22;--muted:#646b76;--faint:#98a0aa;
+ --accent:#c05314;--accent-soft:#f4e3d7;--accent-ink:#8f3d0f;--steel:#2f4a63;
+ --hi:#fff3d6;--hi-line:#e0a83c;
+ --mono:ui-monospace,"SFMono-Regular","Cascadia Code","Consolas",monospace;
+ --sans:system-ui,-apple-system,"Segoe UI","Noto Sans","Noto Sans SC",Roboto,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+ --ground:#0f1215;--surface:#181c22;--surface-2:#1f242b;--line:#2b323b;
+ --ink:#e6e9ee;--muted:#98a1ac;--faint:#69727e;
+ --accent:#e8792f;--accent-soft:#3a2416;--accent-ink:#f0a06a;--steel:#8fb0cd;
+ --hi:#3a3016;--hi-line:#7a5e1e;}}
+:root[data-theme="light"]{--ground:#eceef1;--surface:#fff;--surface-2:#f5f7f9;--line:#d8dde3;--ink:#1a1d22;--muted:#646b76;--faint:#98a0aa;--accent:#c05314;--accent-soft:#f4e3d7;--accent-ink:#8f3d0f;--steel:#2f4a63;--hi:#fff3d6;--hi-line:#e0a83c;}
+:root[data-theme="dark"]{--ground:#0f1215;--surface:#181c22;--surface-2:#1f242b;--line:#2b323b;--ink:#e6e9ee;--muted:#98a1ac;--faint:#69727e;--accent:#e8792f;--accent-soft:#3a2416;--accent-ink:#f0a06a;--steel:#8fb0cd;--hi:#3a3016;--hi-line:#7a5e1e;}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+.app{display:grid;grid-template-columns:322px 1fr;height:100vh;height:100dvh;overflow:hidden}
+aside{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.brand{padding:16px 18px 12px;border-bottom:1px solid var(--line)}
+.brand .eyebrow{font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent-ink);font-weight:700;margin:0 0 4px}
+.brand h1{font-size:16px;margin:0;font-weight:800;line-height:1.15}
+.eqtabs{display:flex;flex-wrap:wrap;gap:6px;padding:12px 14px 6px}
+.eqtabs button{flex:1 1 auto;min-width:72px;padding:8px 6px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:.12s}
+.eqtabs button:hover{border-color:var(--accent);color:var(--ink)}
+.eqtabs button.on{background:var(--steel);color:#fff;border-color:var(--steel)}
+.searchbox{padding:8px 14px;position:relative}
+.searchbox input{width:100%;padding:9px 11px 9px 32px;border:1px solid var(--line);border-radius:7px;background:var(--surface-2);color:var(--ink);font-size:14px;font-family:var(--sans)}
+.searchbox input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.searchbox svg{position:absolute;left:24px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--faint);pointer-events:none}
+.unitlist{overflow-y:auto;flex:1;padding:4px 8px 8px}
+.uitem{padding:8px 10px;border-radius:7px;cursor:pointer;border:1px solid transparent}
+.uitem:hover{background:var(--surface-2)}
+.uitem.on{background:var(--accent-soft);border-color:var(--accent)}
+.uitem .un{font-size:14px;font-weight:600;line-height:1.2}
+.uitem .um{font-family:var(--mono);font-size:11px;color:var(--accent-ink);margin-top:2px;word-break:break-all}
+.uitem .uc{font-size:11px;color:var(--faint);margin-top:2px}
+.seclabel{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:700;padding:12px 14px 0}
+.sidefoot{border-top:1px solid var(--line);padding:9px 14px;font-size:11px;color:var(--faint);line-height:1.5}
+main{overflow-y:auto;min-height:0;position:relative}
+.mainhead{position:sticky;top:0;z-index:10;background:var(--ground);border-bottom:1px solid var(--line);padding:14px 26px 12px;display:flex;align-items:flex-start;gap:12px}
+.mh-txt{flex:1;min-width:0}
+.mainhead .eqname{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.mainhead h2{margin:3px 0 0;font-size:21px;font-weight:800;line-height:1.15;text-wrap:balance}
+.mainhead .unum{font-family:var(--mono);font-size:13px;color:var(--accent-ink);margin-top:3px;word-break:break-all}
+.toolbtn{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.toolbtn button{background:var(--surface);border:1px solid var(--line);border-radius:7px;color:var(--muted);cursor:pointer;padding:8px 11px;font-size:13px;font-family:var(--sans);white-space:nowrap}
+.toolbtn button:hover{border-color:var(--accent);color:var(--ink)}
+.menubtn{display:none}
+.plates{padding:20px 26px 80px;display:flex;flex-direction:column;gap:26px;max-width:1500px}
+.plate{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;scroll-margin-top:104px}
+.plate .phead{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.plate .pnum{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.plate .pcount{font-size:12px;color:var(--faint);margin-left:auto}
+.plate .body{display:grid;grid-template-columns:1.05fr 1fr}
+@media(max-width:1100px){.plate .body{grid-template-columns:1fr}}
+.figs{padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--surface);border-right:1px solid var(--line)}
+.figs img{width:100%;height:auto;border:1px solid var(--line);border-radius:6px;cursor:zoom-in;background:#fff;display:block}
+.figs .noimg{border:1px dashed var(--line);border-radius:6px;padding:26px 14px;text-align:center;color:var(--faint);font-size:12.5px}
+.tblwrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+thead th{position:sticky;top:0;background:var(--surface-2);text-align:left;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+tbody td{padding:7px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:hover{background:var(--surface-2)}
+tbody tr.hit{background:var(--hi);box-shadow:inset 3px 0 0 var(--hi-line)}
+td.pos{font-weight:700;text-align:center;width:1%;font-variant-numeric:tabular-nums}
+td.pos b{display:inline-block;min-width:22px;padding:1px 5px;border:1.5px solid var(--steel);border-radius:11px;font-size:12px;color:var(--steel)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;font-size:12.5px;cursor:copy}
+td.num:hover{color:var(--accent-ink)}
+td.qty{text-align:center;font-variant-numeric:tabular-nums;width:1%;color:var(--muted)}
+.norows{padding:22px;color:var(--faint);text-align:center;font-size:13px}
+.scrim{display:none}
+.results{position:absolute;left:14px;right:14px;top:calc(100% - 6px);background:var(--surface);border:1px solid var(--line);border-radius:9px;box-shadow:0 12px 30px rgba(0,0,0,.25);max-height:60vh;overflow-y:auto;z-index:40;display:none}
+.results.show{display:block}
+.ritem{padding:8px 12px;border-bottom:1px solid var(--line);cursor:pointer;font-size:13px}
+.ritem:hover,.ritem.kb{background:var(--surface-2)}
+.ritem .rn{font-family:var(--mono);font-size:12px;color:var(--accent-ink)}
+.ritem .rm{color:var(--muted);font-size:11.5px}
+.rcount{padding:7px 12px;font-size:11px;color:var(--faint);border-bottom:1px solid var(--line)}
+.lb{position:fixed;inset:0;background:rgba(8,10,12,.93);z-index:100;display:none;overflow:hidden;touch-action:none}
+.lb.show{display:block}
+.lb img{position:absolute;left:50%;top:50%;max-width:none;transform-origin:0 0;cursor:grab;user-select:none;-webkit-user-drag:none}
+.lb img.dragging{cursor:grabbing}
+.lbbar{position:absolute;top:12px;right:14px;display:flex;gap:8px;z-index:110}
+.lbbar button{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:7px;font-size:16px;width:38px;height:38px;cursor:pointer;line-height:1}
+.lbbar button:hover{background:rgba(255,255,255,.22)}
+.lbnav{position:absolute;top:50%;transform:translateY(-50%);z-index:110;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:26px;width:44px;height:64px;border-radius:8px;cursor:pointer;display:none}
+.lbnav:hover{background:rgba(255,255,255,.2)}
+.lbnav.show{display:block}
+#lbprev{left:12px}#lbnext{right:12px}
+.lbhint{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);color:#cfd4da;font-size:12px;z-index:110;text-align:center}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--steel);color:#fff;padding:10px 18px;border-radius:9px;font-size:13.5px;z-index:200;opacity:0;transition:.25s;pointer-events:none;max-width:88vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:900px){
+ .app{grid-template-columns:1fr}
+ aside{position:fixed;left:0;top:0;bottom:0;width:min(84vw,330px);z-index:60;transform:translateX(-105%);transition:transform .2s;box-shadow:8px 0 30px rgba(0,0,0,.25)}
+ aside.open{transform:none}
+ .menubtn{display:inline-block}
+ .mainhead{padding:12px 14px 10px}
+ .plates{padding:14px 12px 70px}
+ .scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:55;display:none}
+ .scrim.show{display:block}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{aside,.toolbtn,.searchbox,.lb,.toast{display:none!important}.app{display:block;height:auto}main{overflow:visible}.plate .body{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+ <aside id="aside">
+  <div class="brand"><p class="eyebrow">Интерактивный каталог запчастей</p><h1>Чертежи и спецификации</h1></div>
+  <div class="eqtabs" id="eqtabs"></div>
+  <div class="searchbox global" id="gbox">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input id="gsearch" type="search" placeholder="Поиск детали по номеру / названию… ( / )" autocomplete="off">
+    <div class="results" id="results"></div>
+  </div>
+  <div class="seclabel">Узлы оборудования</div>
+  <div class="searchbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input id="usearch" type="search" placeholder="Фильтр узлов…" autocomplete="off"></div>
+  <div class="unitlist" id="ulist"></div>
+  <div class="sidefoot" id="sidefoot"></div>
+ </aside>
+ <div class="scrim" id="scrim"></div>
+ <main id="main">
+  <div class="mainhead">
+    <div class="toolbtn"><button class="menubtn" id="menubtn" title="Узлы">☰</button></div>
+    <div class="mh-txt">
+      <div class="eqname" id="eqname"></div>
+      <h2 id="uttl"></h2>
+      <div class="unum" id="unum"></div>
+    </div>
+    <div class="toolbtn">
+      <button id="prevu" title="Предыдущий узел (←)">‹</button>
+      <button id="nextu" title="Следующий узел (→)">›</button>
+      <button id="csvbtn" title="Скачать спецификацию узла в CSV">⬇ CSV</button>
+      <button id="themebtn" title="Светлая/тёмная тема">◐</button>
+    </div>
+  </div>
+  <div class="plates" id="plates"></div>
+ </main>
+</div>
+<div class="lb" id="lb">
+  <div class="lbbar">
+    <button id="lbplus" title="Крупнее">+</button><button id="lbminus" title="Мельче">−</button>
+    <button id="lbreset" title="Сбросить масштаб">1:1</button><button id="lbclose" title="Закрыть (Esc)">×</button>
+  </div>
+  <button class="lbnav" id="lbprev" title="Предыдущий лист (←)">‹</button>
+  <button class="lbnav" id="lbnext" title="Следующий лист (→)">›</button>
+  <img id="lbimg" alt="Чертёж крупно">
+  <div class="lbhint">Колесо — масштаб · перетаскивание — сдвиг · двойной клик — сброс · Esc — закрыть</div>
+</div>
+<div class="toast" id="toast"></div>
+<noscript><p style="padding:30px">Для работы каталога включите JavaScript.</p></noscript>
+<script src="data.js"></script>
+<script>
+(function(){
+'use strict';
+if(!window.CATALOG){document.body.innerHTML='<p style="padding:30px">Файл data.js не найден — выполните сборку: python3 tools/build_catalog.py …</p>';return;}
+var C=window.CATALOG, ORDER=C.order;
+var st={eq:ORDER[0],u:0};
+var esc=function(s){return (s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
+var $=function(id){return document.getElementById(id);};
+/* автономная сборка встраивает чертежи как data: URI в window.CATALOG_ASSETS;
+   обычная сборка держит их файлами рядом в img/ — резолвим и так, и так */
+var resolveImg=function(name){return (window.CATALOG_ASSETS&&window.CATALOG_ASSETS[name])||('img/'+name);};
+
+/* ---------- индекс поиска ---------- */
+var IDX=[];
+ORDER.forEach(function(eq){C.equip[eq].units.forEach(function(u,ui){u.plates.forEach(function(pl,pi){pl.rows.forEach(function(r){
+  IDX.push({eq:eq,ui:ui,pi:pi,num:r.num,name:r.name,pos:r.pos,unit:u.name,
+            _n:r.num.toLowerCase(),_m:(r.name||'').toLowerCase()});});});});});
+
+/* ---------- состояние: hash + localStorage ---------- */
+function readLoc(){
+  var m={};(location.hash||'').replace(/^#/,'').split('&').forEach(function(p){var kv=p.split('=');if(kv[0])m[kv[0]]=decodeURIComponent(kv[1]||'');});
+  if(m.e&&C.equip[m.e]){st.eq=m.e;st.u=Math.min(parseInt(m.u||'0',10)||0,C.equip[m.e].units.length-1);return true;}
+  try{var s=JSON.parse(localStorage.getItem('kmz.loc')||'null');
+      if(s&&C.equip[s.eq]){st.eq=s.eq;st.u=Math.min(s.u||0,C.equip[s.eq].units.length-1);return true;}}catch(e){}
+  return false;
+}
+function saveLoc(){
+  try{localStorage.setItem('kmz.loc',JSON.stringify(st));}catch(e){}
+  history.replaceState(null,'','#e='+st.eq+'&u='+st.u);
+}
+
+/* ---------- вкладки оборудования ---------- */
+function renderTabs(){
+  var h='';ORDER.forEach(function(eq){
+    h+='<button data-eq="'+eq+'" class="'+(eq===st.eq?'on':'')+'" title="'+esc(C.equip[eq].title)+'">'+esc(C.equip[eq].label)+'</button>';});
+  $('eqtabs').innerHTML=h;
+  $('eqtabs').querySelectorAll('button').forEach(function(b){b.onclick=function(){setEq(b.dataset.eq);};});
+}
+function setEq(eq,u){st.eq=eq;st.u=u||0;renderTabs();renderUnitList($('usearch').value);renderMain();saveLoc();}
+
+/* ---------- список узлов ---------- */
+function renderUnitList(filter){
+  var f=(filter||'').toLowerCase(),h='';
+  C.equip[st.eq].units.forEach(function(u,i){
+    if(f&&!(u.name.toLowerCase().indexOf(f)>=0||(u.num||'').indexOf(f)>=0))return;
+    var n=u.plates.reduce(function(a,p){return a+p.rows.length;},0);
+    h+='<div class="uitem '+(i===st.u?'on':'')+'" data-u="'+i+'"><div class="un">'+esc(u.name)+'</div>'+
+       (u.num?'<div class="um">'+esc(u.num)+'</div>':'')+
+       '<div class="uc">'+u.plates.length+' черт. · '+n+' поз.</div></div>';});
+  $('ulist').innerHTML=h||'<div class="norows">Узлы не найдены</div>';
+  $('ulist').querySelectorAll('.uitem').forEach(function(el){el.onclick=function(){
+    st.u=+el.dataset.u;renderUnitList($('usearch').value);renderMain();saveLoc();closeAside();};});
+}
+
+/* ---------- основная область ---------- */
+function rowsTable(rows,hlPos){
+  if(!rows.length)return '<div class="norows">На этом листе — только чертёж (без спецификации)</div>';
+  var h='<div class="tblwrap"><table><thead><tr><th>Поз.</th><th>Идент. номер</th><th>Наименование</th><th>Кол-во</th></tr></thead><tbody>';
+  rows.forEach(function(r){
+    h+='<tr'+(hlPos&&r.pos===hlPos?' class="hit"':'')+'><td class="pos">'+(r.pos?'<b>'+esc(r.pos)+'</b>':'')+'</td>'+
+       '<td class="num" title="Клик — скопировать номер">'+esc(r.num)+'</td>'+
+       '<td>'+(esc(r.name)||'<span style="color:var(--faint)">—</span>')+'</td>'+
+       '<td class="qty">'+esc(r.qty)+'</td></tr>';});
+  return h+'</tbody></table></div>';
+}
+var curImgs=[];  // все изображения текущего узла (для листания в лайтбоксе)
+function renderMain(hl){
+  var u=C.equip[st.eq].units[st.u];
+  $('eqname').textContent=C.equip[st.eq].title;
+  $('uttl').textContent=u.name;$('unum').textContent=u.num||'';
+  var h='';curImgs=[];
+  u.plates.forEach(function(pl,pi){
+    var lbl=pl.ppspan[0]===pl.ppspan[1]?'Стр. '+pl.ppspan[0]:'Стр. '+pl.ppspan[0]+'–'+pl.ppspan[1];
+    var figs=pl.imgs.map(function(im){
+      var gi=curImgs.length,src=resolveImg(im);curImgs.push(src);
+      return '<img loading="lazy" src="'+src+'" data-gi="'+gi+'" alt="Чертёж '+lbl+'" '+
+             'onerror="this.outerHTML=\'<div class=noimg>Изображение не найдено: '+esc(im)+'</div>\'">';}).join('');
+    h+='<div class="plate" id="plate-'+pi+'"><div class="phead"><span class="pnum">Лист · '+lbl+'</span>'+
+       '<span class="pcount">'+pl.rows.length+' позиций</span></div>'+
+       '<div class="body"><div class="figs">'+figs+'</div>'+rowsTable(pl.rows,hl&&hl.pi===pi?hl.pos:null)+'</div></div>';});
+  $('plates').innerHTML=h;
+  $('plates').querySelectorAll('.figs img').forEach(function(img){img.onclick=function(){openLB(+img.dataset.gi);};});
+  $('plates').querySelectorAll('td.num').forEach(function(td){td.onclick=function(){copyText(td.textContent);};});
+  $('main').scrollTop=0;
+  if(hl){var el=$('plate-'+hl.pi);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+}
+function stepUnit(d){
+  var n=C.equip[st.eq].units.length,u=st.u+d;
+  if(u<0||u>=n)return;
+  st.u=u;renderUnitList($('usearch').value);renderMain();saveLoc();
+}
+
+/* ---------- глобальный поиск ---------- */
+var deb;
+function globalSearch(q){
+  clearTimeout(deb);deb=setTimeout(function(){
+    var box=$('results');q=q.trim().toLowerCase();
+    if(q.length<2){box.classList.remove('show');return;}
+    var hits=[],i;
+    for(i=0;i<IDX.length&&hits.length<60;i++){var x=IDX[i];
+      if(x._n.indexOf(q)>=0||x._m.indexOf(q)>=0)hits.push(x);}
+    if(!hits.length){box.innerHTML='<div class="rcount">Ничего не найдено</div>';box.classList.add('show');return;}
+    var h='<div class="rcount">Найдено: '+hits.length+(hits.length>=60?'+':'')+' · Enter — первый результат</div>';
+    hits.forEach(function(x,i){h+='<div class="ritem" data-i="'+i+'"><span class="rn">'+esc(x.num)+'</span> — '+esc(x.name)+
+      '<div class="rm">'+esc(C.equip[x.eq].label)+' · '+esc(x.unit)+' · поз. '+esc(x.pos)+'</div></div>';});
+    box.innerHTML=h;box.classList.add('show');
+    box.querySelectorAll('.ritem').forEach(function(el){el.onclick=function(){go(hits[+el.dataset.i]);};});
+    box._hits=hits;
+  },140);
+}
+function go(x){
+  $('results').classList.remove('show');$('gsearch').value='';$('gsearch').blur();
+  st.eq=x.eq;st.u=x.ui;renderTabs();renderUnitList('');
+  renderMain({pi:x.pi,pos:x.pos});saveLoc();closeAside();
+}
+
+/* ---------- лайтбокс с зумом и панорамой ---------- */
+var lb=$('lb'),lbimg=$('lbimg'),gi=0,scale=1,tx=0,ty=0,drag=null,moved=false;
+function apply(){lbimg.style.transform='translate(-50%,-50%) translate('+tx+'px,'+ty+'px) scale('+scale+')';}
+function fit(){scale=1;tx=0;ty=0;
+  lbimg.style.maxWidth='92vw';lbimg.style.maxHeight='92vh';apply();}
+function openLB(i){gi=i;lbimg.src=curImgs[gi];lb.classList.add('show');fit();navBtns();}
+function closeLB(){lb.classList.remove('show');}
+function navBtns(){
+  $('lbprev').classList.toggle('show',gi>0);
+  $('lbnext').classList.toggle('show',gi<curImgs.length-1);}
+function lbStep(d){var n=gi+d;if(n<0||n>=curImgs.length)return;gi=n;lbimg.src=curImgs[gi];fit();navBtns();}
+function zoomAt(cx,cy,f){
+  var ns=Math.min(8,Math.max(.4,scale*f));f=ns/scale;
+  var r=lb.getBoundingClientRect(),mx=cx-r.width/2,my=cy-r.height/2;
+  tx=mx-(mx-tx)*f;ty=my-(my-ty)*f;scale=ns;apply();}
+lb.addEventListener('wheel',function(e){e.preventDefault();zoomAt(e.clientX,e.clientY,e.deltaY<0?1.25:0.8);},{passive:false});
+lbimg.addEventListener('pointerdown',function(e){e.preventDefault();drag={x:e.clientX,y:e.clientY,tx:tx,ty:ty};moved=false;
+  lbimg.classList.add('dragging');lbimg.setPointerCapture(e.pointerId);});
+lbimg.addEventListener('pointermove',function(e){if(!drag)return;
+  var dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+  if(Math.abs(dx)+Math.abs(dy)>4)moved=true;
+  tx=drag.tx+dx;ty=drag.ty+dy;apply();});
+lbimg.addEventListener('pointerup',function(){drag=null;lbimg.classList.remove('dragging');});
+lbimg.addEventListener('dblclick',fit);
+lb.addEventListener('click',function(e){if(e.target===lb&&!moved)closeLB();});
+$('lbclose').onclick=closeLB;
+$('lbplus').onclick=function(){zoomAt(innerWidth/2,innerHeight/2,1.3);};
+$('lbminus').onclick=function(){zoomAt(innerWidth/2,innerHeight/2,0.77);};
+$('lbreset').onclick=fit;
+$('lbprev').onclick=function(){lbStep(-1);};
+$('lbnext').onclick=function(){lbStep(1);};
+
+/* ---------- CSV экспорт ---------- */
+function exportCSV(){
+  var u=C.equip[st.eq].units[st.u],lines=['Поз.;Идент. номер;Наименование;Кол-во;Стр.'];
+  u.plates.forEach(function(pl){pl.rows.forEach(function(r){
+    lines.push([r.pos,r.num,'"'+(r.name||'').replace(/"/g,'""')+'"',r.qty,pl.ppspan[1]].join(';'));});});
+  var blob=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=(C.equip[st.eq].label+'_'+u.name).replace(/[^\wа-яА-ЯёЁ()\- ]+/g,'_').slice(0,80)+'.csv';
+  document.body.appendChild(a);a.click();a.remove();
+  toast('Спецификация узла сохранена в CSV');
+}
+
+/* ---------- утилиты ---------- */
+var toastT;
+function toast(msg){var t=$('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('show');},1800);}
+function copyText(s){
+  function ok(){toast('Скопировано: '+s);}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(s).then(ok,function(){fallback();});}
+  else fallback();
+  function fallback(){var ta=document.createElement('textarea');ta.value=s;document.body.appendChild(ta);
+    ta.select();try{document.execCommand('copy');ok();}catch(e){}ta.remove();}
+}
+function closeAside(){$('aside').classList.remove('open');$('scrim').classList.remove('show');}
+
+/* ---------- клавиатура ---------- */
+document.addEventListener('keydown',function(e){
+  var typing=/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+  if(e.key==='Escape'){closeLB();$('results').classList.remove('show');closeAside();return;}
+  if(lb.classList.contains('show')){
+    if(e.key==='ArrowLeft')lbStep(-1);
+    if(e.key==='ArrowRight')lbStep(1);
+    return;}
+  if(typing){
+    if(e.key==='Enter'&&document.activeElement.id==='gsearch'){
+      var hits=$('results')._hits;if(hits&&hits.length)go(hits[0]);}
+    return;}
+  if(e.key==='/'){e.preventDefault();$('gsearch').focus();}
+  if(e.key==='ArrowLeft')stepUnit(-1);
+  if(e.key==='ArrowRight')stepUnit(1);
+});
+
+/* ---------- инициализация ---------- */
+$('gsearch').addEventListener('input',function(e){globalSearch(e.target.value);});
+$('usearch').addEventListener('input',function(e){renderUnitList(e.target.value);});
+document.addEventListener('click',function(e){if(!e.target.closest('#gbox'))$('results').classList.remove('show');});
+$('themebtn').onclick=function(){var r=document.documentElement;
+  var cur=r.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  var nxt=cur==='dark'?'light':'dark';r.setAttribute('data-theme',nxt);
+  try{localStorage.setItem('kmz.theme',nxt);}catch(e){}};
+try{var th=localStorage.getItem('kmz.theme');if(th)document.documentElement.setAttribute('data-theme',th);}catch(e){}
+$('csvbtn').onclick=exportCSV;
+$('prevu').onclick=function(){stepUnit(-1);};
+$('nextu').onclick=function(){stepUnit(1);};
+$('menubtn').onclick=function(){$('aside').classList.add('open');$('scrim').classList.add('show');};
+$('scrim').onclick=closeAside;
+window.addEventListener('hashchange',function(){if(readLoc()){renderTabs();renderUnitList('');renderMain();}});
+
+var tot=0,teq=ORDER.length;
+ORDER.forEach(function(eq){C.equip[eq].units.forEach(function(u){u.plates.forEach(function(p){tot+=p.rows.length;});});});
+$('sidefoot').innerHTML='Оборудования: '+teq+' · позиций: '+tot+'<br>Сборка: '+esc(C.generated)+' · генератор v'+esc(C.version);
+
+readLoc();renderTabs();renderUnitList('');renderMain();saveLoc();
+})();
+</script>
+</body>
+</html>
