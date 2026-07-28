@@ -26,21 +26,15 @@ from openpyxl.utils import get_column_letter
 
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BUILD=os.path.join(ROOT,'catalog_book','.build')
-PRICE=os.path.join(ROOT,'Прайс-лист.xlsx')
+import glob
+_pl=sorted(glob.glob(os.path.join(ROOT,'Прайс-лист*.xlsx')))
+PRICE=_pl[-1] if _pl else os.path.join(ROOT,'Прайс-лист.xlsx')
 
 EQLABEL={'bs215':'БС-215','bs230':'БС-230','wp17':'WP17'}
 
-def lossy(n):
-    try: return float(f"{float(n):.11e}")
-    except (ValueError,TypeError): return None
-NRM=re.compile(r'[^0-9A-ZА-ЯЁ ]+')
-def norm(s):
-    if not s: return ''
-    s=str(s).upper().replace('Ё','Е'); s=NRM.sub(' ',s)
-    return re.sub(r'\s+',' ',s).strip()
-def strip_desig(name):
-    m=re.match(r'^\s*[\dA-Za-zА-Яа-я]{1,4}(?:[.\-][\dA-Za-zА-Яа-я]{1,5}){1,6}\s+(.+)$', str(name or ''))
-    return norm(m.group(1)) if m else norm(name)
+# единый источник правды по сопоставлению цен — apply_prices.py
+sys=__import__('sys'); sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from apply_prices import load_price_rows, build_indexes, norm_name as norm, lossy_key as lossy
 
 # ---- каталог: уникальные номера ----
 man=json.load(open(os.path.join(BUILD,'manifest.json'),encoding='utf-8'))
@@ -58,31 +52,24 @@ for eqid in man['order']:
                 if not it['name'] and r['name']: it['name']=r['name']
                 it['eqs'].add(EQLABEL.get(eqid,eqid)); it['units'].add(u['name'])
 
-# ---- прайс: lossy_number -> [(price, name_norm, raw_name)] из обоих листов ----
-wb=openpyxl.load_workbook(PRICE,data_only=True)
-pbk=defaultdict(list)
-for sheet,mn in (('Прайс итоговый',2),('Кросс реф',10)):
-    if sheet not in wb.sheetnames: continue
-    ws=wb[sheet]
-    for row in ws.iter_rows(min_row=mn,values_only=True):
-        num,name,price=row[1],row[2],row[4]
-        if num is None or price is None: continue
-        k=lossy(num)
-        if k is None: continue
-        try: pr=round(float(price),2)
-        except (ValueError,TypeError): continue
-        pbk[k].append((pr,strip_desig(name),str(name or '').strip()))
+# ---- прайс: точный индекс по номеру + запасной по округлённому номеру ----
+_price_rows=load_price_rows(PRICE)
+BY_NUM, BY_KEY = build_indexes(_price_rows)   # by_num: точный номер->цена; by_key: округл.->[записи]
 
 def match(num,name):
-    k=lossy(num)
-    if k is None or k not in pbk: return None,None,'нет в прайсе'
-    cands=pbk[k]; cn=norm(name)
-    ex=[(p,rn) for p,nm,rn in cands if nm and nm==cn]
-    if ex: return ex[0][0],None,'ok'
-    sub=[(p,rn) for p,nm,rn in cands if nm and (nm in cn or cn in nm)]
-    if len(set(p for p,_ in sub))==1: return sub[0][0],None,'ok'
-    # неоднозначно: вернём кандидатов для ручной сверки
-    return None,cands,'под вопросом'
+    # 1) точное совпадение по номеру (новый прайс — номера полным текстом)
+    if num in BY_NUM:
+        return BY_NUM[num], None, 'ok'
+    # 2) запасное: округлённый номер + имя (для старого числового прайса)
+    k=lossy(num); cn=norm(name)
+    cands=BY_KEY.get(k,[]) if k is not None else []
+    if not cands: return None,None,'нет в прайсе'
+    ex=[c for c in cands if c['name'] and c['name']==cn]
+    if ex: return ex[0]['price'],None,'ok'
+    sub=[c for c in cands if c['name'] and (c['name'] in cn or cn in c['name'])]
+    if len(set(c['price'] for c in sub))==1 and sub: return sub[0]['price'],None,'ok'
+    # неоднозначно: кандидаты для ручной сверки -> (price, name_norm, raw_name)
+    return None,[(c['price'],c['name'],c['name']) for c in cands],'под вопросом'
 
 # ---- стили ----
 HEAD_FILL=PatternFill('solid',fgColor='2F4A63'); HF=Font(color='FFFFFF',bold=True)
@@ -161,16 +148,15 @@ notes=[
  f'С проставленной ценой: {priced}',
  f'Требуют ручной сверки (лист «Цена под вопросом»): {n_review}',
  '',
+ 'Цена сопоставляется ТОЧНО по номенклатурному номеру (в актуальном прайс-листе',
+ 'номера хранятся полным текстом с ведущими нулями). Где точного номера нет —',
+ 'пробуется запасное совпадение по номеру+наименованию.',
+ '',
  'Почему у части номеров нет цены:',
  '  • короткие номера Weichai (WP17) — их нет в прайс-листе КМЗ (это норма);',
- '  • номенклатурный номер в самом прайс-листе хранится как ЧИСЛО и уже потерял',
- '    точность на длинных номерах — поэтому сопоставление идёт по паре',
- '    «округлённый номер + наименование», и неоднозначные случаи не проставляются',
- '    автоматически, а вынесены на лист «Цена под вопросом»;',
- '  • часть деталей просто отсутствует в прайс-листе.',
- '',
- 'Точное 100%-е сопоставление возможно, если КМЗ выгрузит прайс с колонкой',
- 'номера в ТЕКСТОВОМ формате (Формат ячеек → Текстовый до ввода данных).',
+ '  • деталь отсутствует в прайс-листе;',
+ '  • номер есть, но наименование расходится — такие вынесены на лист',
+ '    «Цена под вопросом» для ручной сверки (без авто-подстановки неверной цены).',
 ]
 for i,t in enumerate(notes,1):
     ws3.cell(i,1,t)
