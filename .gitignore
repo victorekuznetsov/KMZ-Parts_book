@@ -3,3 +3,6 @@ catalog_book/data.js
 catalog_book/.build/
 catalog_book_standalone.html
 __pycache__/
+catalog_book/docs_img/
+catalog_book/docs.js
+catalog_book/Руководства_test.html
