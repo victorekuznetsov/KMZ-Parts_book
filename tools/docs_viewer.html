@@ -20,7 +20,7 @@ aside{background:var(--surface);border-right:1px solid var(--line);display:flex;
 .brand{padding:14px 16px 10px;border-bottom:1px solid var(--line)}
 .brand .eyebrow{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);font-weight:700;margin:0 0 3px}
 .brand h1{font-size:15.5px;margin:0;font-weight:800;line-height:1.15}
-.brand a.back{display:inline-block;margin-top:7px;font-size:12px;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:4px 9px}
+.brand a.back{display:inline-block;margin-top:7px;margin-right:6px;font-size:12px;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:4px 9px}
 .brand a.back:hover{border-color:var(--accent);color:var(--accent-ink)}
 .doctabs{display:flex;flex-wrap:wrap;gap:5px;padding:10px 12px 4px}
 .doctabs button{flex:1 1 auto;min-width:60px;padding:7px 5px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);border-radius:7px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:var(--sans)}
@@ -84,7 +84,8 @@ main{overflow-y:auto;min-height:0;position:relative;display:flex;flex-direction:
  <aside id="aside">
   <div class="brand">
    <p class="eyebrow">Руководства по эксплуатации</p><h1>Станок буровой БС-215</h1>
-   <a class="back" id="backlink" href="index.html">‹ К каталогу запчастей</a>
+   <a class="back" id="backlink" href="../index.html">‹ К единому каталогу</a>
+   <a class="back" id="backlink2" href="index.html">‹ Каталог одним файлом</a>
   </div>
   <div class="doctabs" id="doctabs"></div>
   <div class="searchbox">
@@ -122,7 +123,7 @@ main{overflow-y:auto;min-height:0;position:relative;display:flex;flex-direction:
 (function(){
 'use strict';
 if(!window.DOCS||!window.DOCS.docs.length){document.body.innerHTML='<p style="padding:30px">docs.js не найден — соберите: python3 tools/build_docs.py …</p>';return;}
-var D=window.DOCS.docs, st={d:0,p:0};
+var D=window.DOCS.docs, st={d:0,p:0,q:''};
 var $=function(id){return document.getElementById(id);};
 var esc=function(s){return (s||'').replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});};
 var resolveImg=function(n){return (window.DOCS_ASSETS&&window.DOCS_ASSETS[n])||('docs_img/'+n);};
@@ -131,12 +132,23 @@ var resolveImg=function(n){return (window.DOCS_ASSETS&&window.DOCS_ASSETS[n])||(
 var IDX=[];
 D.forEach(function(doc,di){doc.pages.forEach(function(pg,pi){IDX.push({d:di,p:pi,t:(pg.text||'').toLowerCase(),raw:pg.text||''});});});
 
+/* Хеш понимает три параметра:
+     #doc=<id>          открыть это руководство
+     &page=<N>          на этой странице
+     &q=<запрос>        сразу выполнить поиск по тексту всех руководств;
+                        если doc не задан, читатель переходит на первую
+                        найденную страницу. По такой ссылке из каталога
+                        запчастей открывается узел в тексте руководств. */
 function readHash(){
  var m={};(location.hash||'').replace(/^#/,'').split('&').forEach(function(x){var kv=x.split('=');if(kv[0])m[kv[0]]=decodeURIComponent(kv[1]||'');});
+ st.q=m.q||'';
  if(m.doc){var di=D.findIndex(function(x){return x.id===m.doc;});if(di>=0){st.d=di;var p=parseInt(m.page||'1',10)||1;st.p=Math.min(Math.max(0,p-1),D[di].pages.length-1);return true;}}
- return false;
+ return !!st.q;
 }
-function saveHash(){history.replaceState(null,'','#doc='+D[st.d].id+'&page='+(st.p+1));}
+function saveHash(){
+ history.replaceState(null,'','#doc='+D[st.d].id+'&page='+(st.p+1)+
+   (st.q?'&q='+encodeURIComponent(st.q):''));
+}
 
 function renderTabs(){
  var h='';D.forEach(function(doc,i){
@@ -169,11 +181,13 @@ function step(n){var np=st.p+n;if(np<0||np>=D[st.d].pages.length)return;st.p=np;
 
 /* поиск */
 var deb;
-function search(q){clearTimeout(deb);deb=setTimeout(function(){
+function search(q){clearTimeout(deb);deb=setTimeout(function(){runSearch(q);},130);}
+function runSearch(q){
+ {
  var box=$('results');q=q.trim().toLowerCase();
- if(q.length<3){box.classList.remove('show');return;}
+ if(q.length<3){box.classList.remove('show');return null;}
  var hits=[];for(var i=0;i<IDX.length&&hits.length<80;i++){var x=IDX[i];var pos=x.t.indexOf(q);if(pos>=0)hits.push({x:x,pos:pos});}
- if(!hits.length){box.innerHTML='<div class="rcount">Ничего не найдено</div>';box.classList.add('show');return;}
+ if(!hits.length){box.innerHTML='<div class="rcount">Ничего не найдено</div>';box.classList.add('show');return hits;}
  var h='<div class="rcount">Найдено на страницах: '+hits.length+(hits.length>=80?'+':'')+'</div>';
  hits.forEach(function(hit,i){
   var x=hit.x,s=x.raw,pos=hit.pos;
@@ -181,8 +195,10 @@ function search(q){clearTimeout(deb);deb=setTimeout(function(){
   var snip=(a>0?'…':'')+esc(s.slice(a,pos))+'<mark>'+esc(s.slice(pos,pos+q.length))+'</mark>'+esc(s.slice(pos+q.length,b))+(b<s.length?'…':'');
   h+='<div class="ritem" data-i="'+i+'"><div class="rd">'+esc(D[x.d].title.split('—')[0].trim())+' · стр. '+(x.p+1)+'</div><div class="rs">'+snip+'</div></div>';});
  box.innerHTML=h;box.classList.add('show');box._hits=hits;
- box.querySelectorAll('.ritem').forEach(function(el){el.onclick=function(){var hh=hits[+el.dataset.i].x;st.d=hh.d;st.p=hh.p;box.classList.remove('show');$('gsearch').value='';render();closeAside();};});
-},130);}
+ box.querySelectorAll('.ritem').forEach(function(el){el.onclick=function(){var hh=hits[+el.dataset.i].x;st.d=hh.d;st.p=hh.p;st.q='';box.classList.remove('show');$('gsearch').value='';render();closeAside();};});
+ return hits;
+ }
+}
 
 /* лайтбокс */
 var lb=$('lb'),lbimg=$('lbimg'),scale=1,tx=0,ty=0,drag=null,moved=false;
@@ -206,7 +222,7 @@ function closeAside(){$('aside').classList.remove('open');$('scrim').classList.r
 $('menubtn').onclick=function(){$('aside').classList.add('open');$('scrim').classList.add('show');};
 $('scrim').onclick=closeAside;
 $('prev').onclick=function(){step(-1);};$('next').onclick=function(){step(1);};
-$('gsearch').addEventListener('input',function(e){search(e.target.value);});
+$('gsearch').addEventListener('input',function(e){st.q=e.target.value.trim();search(e.target.value);});
 document.addEventListener('click',function(e){if(!e.target.closest('.searchbox'))$('results').classList.remove('show');});
 $('theme').onclick=function(){var r=document.documentElement;var cur=r.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');var nx=cur==='dark'?'light':'dark';r.setAttribute('data-theme',nx);try{localStorage.setItem('kmz.theme',nx);}catch(e){}};
 try{var th=localStorage.getItem('kmz.theme');if(th)document.documentElement.setAttribute('data-theme',th);}catch(e){}
@@ -217,9 +233,21 @@ document.addEventListener('keydown',function(e){
  if(e.key==='/'){e.preventDefault();$('gsearch').focus();}
  if(e.key==='ArrowLeft')step(-1);if(e.key==='ArrowRight')step(1);
 });
-window.addEventListener('hashchange',function(){if(readHash())render();});
+/* применить запрос из ссылки: подставить в поле, показать результаты и —
+   если конкретное руководство не задано — открыть первую найденную страницу */
+function applyQuery(jump){
+ if(!st.q)return;
+ $('gsearch').value=st.q;
+ var hits=runSearch(st.q);
+ if(jump&&hits&&hits.length){var h0=hits[0].x;st.d=h0.d;st.p=h0.p;render();}
+}
+window.addEventListener('hashchange',function(){
+ var hadDoc=(location.hash||'').indexOf('doc=')>=0;
+ if(readHash()){render();applyQuery(!hadDoc);}
+});
 $('sidefoot').innerHTML='Руководств: '+D.length+' · страниц: '+window.DOCS.stats.pages+'<br>Сборка: '+esc(window.DOCS.generated);
-readHash();render();
+var startedWithDoc=(location.hash||'').indexOf('doc=')>=0;
+readHash();render();applyQuery(!startedWithDoc);
 })();
 </script>
 </body>

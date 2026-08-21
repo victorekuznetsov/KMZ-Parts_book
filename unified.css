@@ -441,3 +441,11 @@ button.manual-btn.machine-site { cursor: pointer; font-family: inherit; }
 button.xref-link.docs-open { font: inherit; cursor: pointer; }
 /* на карточке машины документы перечисляются списком */
 .mcard-full + .mcard-full { margin-top: 4px; }
+
+/* ссылка «найти узел в руководствах» рядом с кнопкой документов */
+.xref-link.tomanual {
+  background: var(--chip-bg); border-color: var(--line-strong); color: var(--chip-ink);
+}
+.xref-link.tomanual:hover {
+  border-color: var(--accent-strong); color: var(--accent-ink); text-decoration: none;
+}

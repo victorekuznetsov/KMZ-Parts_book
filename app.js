@@ -414,6 +414,14 @@
     var toMachine = !mdocs.length ? "" :
       '<button type="button" class="xref-link tomachine docs-open">📖 Документы ' +
       esc(m.name) + " · " + mdocs.length + " →</button>";
+    // поиск этого узла по тексту руководств машины
+    var mbase = manualsBase(m.id), mq = manualQuery(s.zh || s.en);
+    if (mbase && mq) {
+      toMachine += '<a class="xref-link tomanual" target="_blank" rel="noopener" href="' +
+        esc(mbase) + "#q=" + encodeURIComponent(mq) +
+        '" title="Открыть руководства и найти «' + esc(mq) + '» в тексте">' +
+        "🔎 Найти узел в руководствах →</a>";
+    }
     head.innerHTML =
       '<div class="crumb"><a class="crumb-link" href="#/">Выбор моделей</a> · ' +
       '<a class="crumb-link" href="' + catHash(m.id, curCat) + '">' + esc(m.name) + " · " + esc(catLabel(curCat)) + "</a> · " +
@@ -1454,6 +1462,25 @@
   // «читателе» catalog_book/Руководства.html на нужном документе (#doc=<id>),
   // прежний самодостаточный просмотрщик — на нужном оборудовании (#e=<id>).
   function docsOf(id) { return ((machineById[id] || {}).docs) || []; }
+
+  // Адрес читателя руководств машины (без якоря), если руководства у неё есть.
+  function manualsBase(id) {
+    var d = docsOf(id).filter(function (x) { return /Руководства\.html/i.test(x.url); })[0];
+    return d ? d.url.split("#")[0] : "";
+  }
+  // Запрос для поиска узла в тексте руководств. Читатель ищет подстроку, а
+  // названия узлов и текст руководств стоят в разных падежах, поэтому берём
+  // самое длинное слово названия и отбрасываем окончание — грубая основа
+  // («пылеподавления» -> «пылеподавлени») находит и другие формы слова.
+  function manualQuery(name) {
+    var low = String(name || "").toLowerCase();
+    // только буквенные слова: обозначения вида «БС-215-02» в тексте руководств
+    // пишутся иначе и в качестве запроса бесполезны
+    var words = low.match(/[a-zа-яё]{4,}/g) || low.match(/[a-zа-яё0-9-]{4,}/g) || [];
+    if (!words.length) return "";
+    var w = words.sort(function (a, b) { return b.length - a.length; })[0];
+    return w.length >= 8 ? w.slice(0, w.length - 2) : w;
+  }
 
   function openDocs() {
     var m = machine(), docs = docsOf(m.id);
