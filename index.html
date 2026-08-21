@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Единый каталог запасных частей КМЗ</title>
+<link rel="icon" href="favicon.svg">
+<link rel="stylesheet" href="styles.css?v=k1">
+<link rel="stylesheet" href="unified.css?v=k1">
+<script>
+  /* тема применяется до отрисовки, чтобы не мигало */
+  (function(){try{
+    var t=localStorage.getItem("kmz_theme");
+    if(!t)t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
+    document.documentElement.setAttribute("data-theme",t);
+  }catch(e){document.documentElement.setAttribute("data-theme","light");}})();
+</script>
+</head>
+<body>
+
+<div class="contact-bar">
+  <span class="ctext">По вопросам работы каталога запасных частей, ошибок и замечаний обращаться к&nbsp;Кузнецову&nbsp;В.Е.</span>
+  <a class="cmail" href="mailto:KuznetsovVE@industrservice.ru">KuznetsovVE@industrservice.ru</a>
+  <button class="logout-btn" id="logoutBtn" type="button" title="Выйти из каталога">Выйти ⎋</button>
+</div>
+
+<header class="app">
+  <button class="menu-btn" id="menuBtn" aria-label="Меню">☰</button>
+  <button class="home-btn" id="homeBtn" type="button" title="Вернуться к выбору моделей">⌂ Выбор моделей</button>
+  <div class="logo">
+    <span class="mark" aria-hidden="true">
+      <svg viewBox="0 0 196 196" width="30" height="30"><path d="M63.5941 165.078 114.786 64.5721 99.6758 31 83.5127 31 16 165.078 63.5941 165.078Z"/><path d="M107.608 118.291 152.342 118.291 179.684 64.5721 164.574 31 119.559 31 134.669 64.5721 107.608 118.291Z"/></svg>
+    </span>
+    <div class="title">
+      <div class="t1">Развитие · Единый каталог запчастей</div>
+      <div class="t2" id="machineSub">Всё оборудование КМЗ</div>
+    </div>
+  </div>
+
+  <div class="machine-switch" id="machineSwitch" role="tablist" aria-label="Выбор машины"></div>
+
+  <div class="search">
+    <input id="search" type="search" placeholder="Поиск по номеру детали или названию…" autocomplete="off">
+    <span class="ico">⌕</span>
+  </div>
+  <span class="spacer"></span>
+  <a class="manual-btn machine-site" id="machineSite" href="#" target="_blank" rel="noopener">📚 Полный каталог машины (руководства, ремонт, двигатель)</a>
+  <button class="icon-btn" id="themeBtn" type="button" title="Светлая / тёмная тема" aria-label="Переключить тему">
+    <svg class="ico-sun" viewBox="0 0 24 24" width="18" height="18" fill="none"
+         stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4.2"/>
+      <path d="M12 2.5v2.5M12 19v2.5M2.5 12h2.5M19 12h2.5M5 5l1.8 1.8M17.2 17.2 19 19M19 5l-1.8 1.8M6.8 17.2 5 19"/>
+    </svg>
+    <svg class="ico-moon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+      <path d="M21 13.2A8.5 8.5 0 1 1 10.8 3 6.8 6.8 0 0 0 21 13.2Z"/>
+    </svg>
+  </button>
+  <button class="price-btn" id="checkBtn" type="button" title="Проверить список номеров по всему оборудованию">🔎 Проверить список</button>
+  <button class="price-btn" id="pricesBtn" type="button" title="Обновить цены выбранной машины из файла прайса">💲 Обновить цены</button>
+  <button class="cart-btn" id="cartBtn">
+    <span>Заказ</span>
+    <span class="count" id="cartCount">0</span>
+  </button>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="cat-tabs" id="catTabs" role="tablist" aria-label="Раздел каталога"></div>
+    <div class="sidebar-machine" id="sidebarMachine"></div>
+    <div class="sidebar-tools">
+      <button id="exportAll">⬇ Экспорт всех номеров со всеми атрибутами (Excel)</button>
+    </div>
+    <div id="chapters"></div>
+  </nav>
+  <main class="content" id="content"></main>
+</div>
+
+<!-- заказ-спецификация -->
+<div class="overlay" id="overlay"></div>
+<aside class="cart" id="cart">
+  <div class="cart-h">
+    <h2>Заказ-спецификация</h2>
+    <button class="close" id="cartClose" aria-label="Закрыть">×</button>
+  </div>
+  <div class="cart-serial">
+    <label for="serial">Заводской / серийный номер машины</label>
+    <input id="serial" type="text" placeholder="напр. КМЗ-000001">
+  </div>
+  <div class="cart-lines" id="cartLines"></div>
+  <div class="cart-foot">
+    <div class="total"><span>Итого</span><span id="cartTotal">0.00</span></div>
+    <div class="note" id="cartNote"></div>
+    <div class="acts">
+      <button class="btn primary" id="exportCsv">Экспорт Excel</button>
+      <button class="btn" id="printOrder">Печать</button>
+      <button class="btn ghost" id="clearCart">Очистить</button>
+    </div>
+  </div>
+</aside>
+
+<!-- карточка детали -->
+<div class="overlay" id="pcOverlay"></div>
+<aside class="part-card" id="partCard">
+  <div class="cart-h">
+    <h2 id="pcTitle">Деталь</h2>
+    <button class="close" id="pcClose" aria-label="Закрыть">×</button>
+  </div>
+  <div class="pc-body">
+    <div class="pc-gallery hidden" id="pcGallery">
+      <div class="pc-main"><img id="pcImg" alt="Фото детали"></div>
+      <div class="pc-thumbs" id="pcThumbs"></div>
+    </div>
+    <div class="pc-name" id="pcName"></div>
+    <div class="pc-order">
+      <label for="pcNeed">Нужно</label>
+      <input id="pcNeed" class="need" type="number" min="1" value="1">
+      <button class="btn primary" id="pcAdd" type="button">＋ в заказ</button>
+    </div>
+    <div class="pc-block hidden" id="pcSup">
+      <h3>Замена номера</h3>
+      <div id="pcSupBody"></div>
+    </div>
+    <div class="pc-block hidden" id="pcAttrs">
+      <h3>Характеристики и цены</h3>
+      <table class="pc-table"><tbody id="pcAttrsBody"></tbody></table>
+    </div>
+    <div class="pc-block hidden" id="pcUsed">
+      <h3>Где применяется <span class="pc-count" id="pcUsedCount"></span></h3>
+      <div class="pc-used" id="pcUsedBody"></div>
+    </div>
+  </div>
+</aside>
+
+<!-- обновление цен -->
+<div class="overlay" id="pmOverlay"></div>
+<div class="price-modal" id="priceModal" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
+  <div class="pm-h">
+    <h2 id="pmTitle">Обновление цен</h2>
+    <button class="close" id="pmClose" aria-label="Закрыть">×</button>
+  </div>
+  <div class="pm-body">
+    <p class="pm-note">Цены обновляются для <b id="pmMachine">выбранной машины</b>. Загрузите файл прайс-листа
+      (<b>.xlsx</b> или <b>.csv</b>) со столбцами «Артикул», «Взаимозаменяемый артикул», «Наименование»,
+      «Цена без НДС», «Группа». Цены применятся сразу и сохранятся в этом браузере.</p>
+    <label class="pm-file" for="priceFile">
+      <span class="pm-file-ico">⬆</span>
+      <span id="pmFileLabel">Выбрать файл прайса…</span>
+      <input type="file" id="priceFile" accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+    </label>
+    <div class="pm-status" id="priceStatus"></div>
+    <p class="pm-note pm-hint">Чтобы обновление стало <b>постоянным</b> и перешло другим пользователям —
+      скачайте <code>prices.js</code> и положите его в папку <code id="pmPath">&lt;машина&gt;/data/</code>
+      вместо старого файла (в подпапке соответствующей машины).</p>
+    <div class="pm-acts">
+      <button class="btn primary" id="priceDownload" type="button">⬇ Скачать prices.js</button>
+      <button class="btn ghost" id="priceReset" type="button">Сбросить к заводским</button>
+    </div>
+  </div>
+</div>
+
+<!-- проверка списка номеров -->
+<div class="overlay" id="chkOverlay"></div>
+<div class="check-modal" id="checkModal" role="dialog" aria-modal="true" aria-labelledby="chkTitle">
+  <div class="pm-h">
+    <h2 id="chkTitle">Проверка списка номеров по всему оборудованию</h2>
+    <button class="close" id="chkClose" aria-label="Закрыть">×</button>
+  </div>
+  <div class="chk-body">
+    <p class="pm-note">Вставьте номера деталей (по одному в строке, можно через запятую, пробел или
+      точку с запятой) или загрузите файл <b>.xlsx</b>/<b>.csv</b>/<b>.txt</b> (номера берутся из
+      первого столбца). Проверка идёт по <b>всем машинам каталога</b>; номер находится и как
+      <b>взаимозаменяемый</b> (старый) артикул. Показывается, в каком каталоге и разделе есть номер,
+      какие номера из списка <b>отсутствуют в каталоге</b>, и (по кнопке) какие номера каталога
+      <b>отсутствуют в вашем списке</b>.</p>
+    <textarea id="chkInput" rows="5" placeholder="Номера деталей — по одному в строке"></textarea>
+    <div class="chk-actions">
+      <button class="btn primary" id="chkRun" type="button">Проверить</button>
+      <label class="btn ghost chk-filelbl" for="chkFile">Загрузить файл…</label>
+      <input type="file" id="chkFile" accept=".xlsx,.csv,.txt,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+      <button class="btn ghost" id="chkExport" type="button" disabled>⬇ Выгрузить результат (Excel)</button>
+      <button class="btn ghost" id="chkMissing" type="button" disabled title="Номера каталога, которых нет в вашем списке">⬇ Отсутствуют в списке (Excel)</button>
+      <button class="btn ghost" id="chkClear" type="button">Очистить</button>
+    </div>
+    <div class="chk-scope" id="chkScope"></div>
+    <div class="chk-status" id="chkStatus"></div>
+    <div class="chk-results" id="chkResults"></div>
+  </div>
+</div>
+
+<!-- просмотр чертежа во весь экран -->
+<div class="lightbox" id="lightbox"><span class="x" id="lbClose">×</span><img id="lbImg" alt=""></div>
+<div class="toast" id="toast"></div>
+
+<script src="data/app.js?v=k1"></script>
+<script src="data/catalogs.js?v=k1"></script>
+<script src="data/prices.js?v=k1"></script>
+<script src="data/part_info.js?v=k1"></script>
+<script src="app.js?v=k1"></script>
+</body>
+</html>
