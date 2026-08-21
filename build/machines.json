@@ -16,24 +16,73 @@
       "name": "БС-215",
       "subtitle": "станок буровой самоходный БАРС (БС-215.00.00.000-02 РЭ2)",
       "currency": "RUB",
-      "nativeUrl": "catalog_book/Руководства.html",
-      "nativeLabel": "📖 Руководства по эксплуатации БС-215 (РЭ2, РЭ3, РЭ4, теххарактеристики)"
+      "docs": [
+        {
+          "url": "catalog_book/Руководства.html#doc=tehnichesk",
+          "label": "Технические характеристики БС-215",
+          "kind": "Руководство",
+          "src": "4 Технические характеристики бурового станка БС 215.pdf"
+        },
+        {
+          "url": "catalog_book/Руководства.html#doc=re2rukovod",
+          "label": "РЭ2 — Руководство по эксплуатации",
+          "kind": "Руководство",
+          "src": "БС-215.00.00.000-01 РЭ2-1-17.pdf"
+        },
+        {
+          "url": "catalog_book/Руководства.html#doc=re3rukovod",
+          "label": "РЭ3 — Руководство по эксплуатации",
+          "kind": "Руководство",
+          "src": "БС-215.00.00.000-01 РЭ3"
+        },
+        {
+          "url": "catalog_book/Руководства.html#doc=re4rukovod",
+          "label": "РЭ4 — Руководство по эксплуатации",
+          "kind": "Руководство",
+          "src": "БС-215.00.00.000-01 РЭ4.pdf"
+        },
+        {
+          "url": "catalog_book/Руководства.html#doc=instrukciy",
+          "label": "Инструкция от 22.09.2020",
+          "kind": "Руководство",
+          "src": "БС-215_22.09.2020_003.pdf"
+        },
+        {
+          "url": "catalog_book/index.html#e=bs215",
+          "label": "Каталог запчастей одним файлом (офлайн-просмотрщик)",
+          "kind": "Каталог",
+          "src": "catalog_book/index.html"
+        }
+      ]
     },
     {
       "id": "bs230",
       "name": "БС-230",
       "subtitle": "станок буровой (БС-230.00.00.000 РЭ2)",
       "currency": "RUB",
-      "nativeUrl": "",
-      "nativeLabel": ""
+      "docs": [
+        {
+          "url": "catalog_book/index.html#e=bs230",
+          "label": "Каталог запчастей одним файлом (офлайн-просмотрщик)",
+          "kind": "Каталог",
+          "src": "catalog_book/index.html"
+        }
+      ]
     },
     {
       "id": "wp17",
       "name": "WP17",
       "subtitle": "двигатель Weichai серии WP17",
       "currency": "RUB",
-      "nativeUrl": "",
-      "nativeLabel": ""
+      "docs": [
+        {
+          "url": "catalog_book/index.html#e=wp17",
+          "label": "Каталог запчастей одним файлом (офлайн-просмотрщик)",
+          "kind": "Каталог",
+          "src": "catalog_book/index.html"
+        }
+      ]
     }
-  ]
+  ],
+  "//docs": "Документы машины: подключаются в панель «📖 Документы» и в шапку раздела."
 }

@@ -44,7 +44,7 @@
     <span class="ico">⌕</span>
   </div>
   <span class="spacer"></span>
-  <a class="manual-btn machine-site" id="machineSite" href="#" target="_blank" rel="noopener">📚 Полный каталог машины (руководства, ремонт, двигатель)</a>
+  <button class="manual-btn machine-site" id="docsBtn" type="button" title="Руководства и каталоги машины">📖 Документы</button>
   <button class="icon-btn" id="themeBtn" type="button" title="Светлая / тёмная тема" aria-label="Переключить тему">
     <svg class="ico-sun" viewBox="0 0 24 24" width="18" height="18" fill="none"
          stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -96,6 +96,16 @@
       <button class="btn ghost" id="clearCart">Очистить</button>
     </div>
   </div>
+</aside>
+
+<!-- документы машины: руководства и прежний просмотрщик -->
+<div class="overlay" id="docsOverlay"></div>
+<aside class="part-card docs-panel" id="docsPanel">
+  <div class="cart-h">
+    <h2 id="docsTitle">Документы</h2>
+    <button class="close" id="docsClose" aria-label="Закрыть">×</button>
+  </div>
+  <div class="pc-body" id="docsBody"></div>
 </aside>
 
 <!-- карточка детали -->

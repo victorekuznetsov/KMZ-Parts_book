@@ -234,14 +234,15 @@
     $("#machineSub").textContent = onLanding
       ? FLEET
       : m.name + " · " + (m.subtitle || "");
-    // Кнопка родных материалов машины: путь и подпись задаются в
-    // build/machines.json (nativeUrl / nativeLabel). Пусто — кнопки нет.
-    var site = $("#machineSite");
-    var nurl = m.nativeUrl || "";
-    site.href = nurl || "#";
-    site.textContent = m.nativeLabel || "📚 Полный каталог машины";
-    site.title = m.nativeLabel || ("Материалы " + m.name);
-    site.classList.toggle("hidden", !nurl);
+    // Кнопка документов машины: перечень задаётся в build/machines.json (docs).
+    // Нет документов — нет и кнопки.
+    var docs = docsOf(m.id);
+    var site = $("#docsBtn");
+    site.textContent = "📖 Документы" + (docs.length > 1 ? " · " + docs.length : "");
+    site.title = docs.length
+      ? "Руководства и каталоги " + m.name + ": " + docs.map(function (d) { return d.label; }).join("; ")
+      : "";
+    site.classList.toggle("hidden", !docs.length);
     $("#pmMachine").textContent = m.name;
     $("#pmPath").textContent = m.id + "/data/";
   }
@@ -344,9 +345,11 @@
         return '<a class="mcard-cat cat-' + c2.key + '" href="' + catHash(m.id, c2.key) + '">' + esc(c2.label) + "</a>";
       }).join("");
       var stat = machineStats(m.id);
-      var native = !m.nativeUrl ? "" :
-        '<a class="mcard-full" href="' + esc(m.nativeUrl) + '" target="_blank" rel="noopener">' +
-        esc(m.nativeLabel || "📚 Родные материалы машины") + " ↗</a>";
+      var mdocs = docsOf(m.id);
+      var native = mdocs.map(function (d) {
+        return '<a class="mcard-full" href="' + esc(d.url) + '" target="_blank" rel="noopener">' +
+          (d.kind === "Каталог" ? "📚 " : "📖 ") + esc(d.label) + " ↗</a>";
+      }).join("");
       card.innerHTML =
         '<div class="mcard-badge ' + mcolor(m.id) + '">' + esc(m.name) + "</div>" +
         '<div class="mcard-sub">' + esc(m.subtitle || "") + "</div>" +
@@ -405,10 +408,12 @@
     var ch = chapterName[s.chapter] || { code: s.chapter, en: "" };
     var head = el("div", "sec-head");
     var count = sectionParts(s).filter(function (p) { return p.pn; }).length;
-    // ссылка на родные материалы машины — только если они у машины есть
-    var toMachine = !m.nativeUrl ? "" :
-      '<a class="xref-link tomachine" href="' + esc(m.nativeUrl) + '" target="_blank" rel="noopener">' +
-      esc(m.nativeLabel || ("📚 Материалы " + m.name)) + ' →</a>';
+    // Одна ссылка на документы машины: перечислять их все над каждым разделом
+    // — лишний шум, полный список открывается в панели «Документы».
+    var mdocs = docsOf(m.id);
+    var toMachine = !mdocs.length ? "" :
+      '<button type="button" class="xref-link tomachine docs-open">📖 Документы ' +
+      esc(m.name) + " · " + mdocs.length + " →</button>";
     head.innerHTML =
       '<div class="crumb"><a class="crumb-link" href="#/">Выбор моделей</a> · ' +
       '<a class="crumb-link" href="' + catHash(m.id, curCat) + '">' + esc(m.name) + " · " + esc(catLabel(curCat)) + "</a> · " +
@@ -419,6 +424,9 @@
       count + " позиц. с номером детали</div>" +
       (toMachine ? '<div class="xref-row">' + toMachine + "</div>" : "");
     content.appendChild(head);
+
+    var openBtn = head.querySelector(".docs-open");
+    if (openBtn) openBtn.addEventListener("click", openDocs);
 
     var figs = s.figures || [];
     figs.forEach(function (f, i) { content.appendChild(renderFigure(s, f, i, figs.length)); });
@@ -1441,6 +1449,44 @@
     $("#checkModal").classList.remove("open"); $("#chkOverlay").classList.remove("open");
   }
 
+  // ---- документы машины (руководства и прежний просмотрщик) --------------
+  // Перечень задаётся в build/machines.json. Руководства открываются в
+  // «читателе» catalog_book/Руководства.html на нужном документе (#doc=<id>),
+  // прежний самодостаточный просмотрщик — на нужном оборудовании (#e=<id>).
+  function docsOf(id) { return ((machineById[id] || {}).docs) || []; }
+
+  function openDocs() {
+    var m = machine(), docs = docsOf(m.id);
+    $("#docsTitle").textContent = "Документы · " + m.name;
+    var body = $("#docsBody");
+    if (!docs.length) {
+      body.innerHTML = '<p class="pm-note">Для этой машины документов в репозитории нет.</p>';
+    } else {
+      var groups = {}, order = [];
+      docs.forEach(function (d) {
+        var k = d.kind || "Документ";
+        if (!groups[k]) { groups[k] = []; order.push(k); }
+        groups[k].push(d);
+      });
+      body.innerHTML = order.map(function (k) {
+        return '<div class="docs-group"><h3>' + esc(k === "Руководство" ? "Руководства по эксплуатации" : k) +
+          "</h3>" + groups[k].map(function (d) {
+            return '<a class="docs-row" href="' + esc(d.url) + '" target="_blank" rel="noopener">' +
+              '<span class="ico">' + (k === "Каталог" ? "📚" : "📖") + "</span>" +
+              '<span class="txt"><b>' + esc(d.label) + "</b>" +
+              (d.src ? '<span class="src">' + esc(d.src) + "</span>" : "") + "</span>" +
+              '<span class="go">↗</span></a>';
+          }).join("") + "</div>";
+      }).join("");
+    }
+    $("#docsOverlay").classList.add("open");
+    $("#docsPanel").classList.add("open");
+  }
+  function closeDocs() {
+    $("#docsOverlay").classList.remove("open");
+    $("#docsPanel").classList.remove("open");
+  }
+
   // ---- тема: светлая / тёмная -------------------------------------------
   function themeKey() { return NS + "_theme"; }
   function currentTheme() {
@@ -1722,10 +1768,13 @@
 
     $("#lbClose").addEventListener("click", closeLightbox);
     $("#lightbox").addEventListener("click", function (e) { if (e.target.id === "lightbox") closeLightbox(); });
+    $("#docsBtn").addEventListener("click", function (e) { e.preventDefault(); openDocs(); });
+    $("#docsClose").addEventListener("click", closeDocs);
+    $("#docsOverlay").addEventListener("click", closeDocs);
     $("#pcClose").addEventListener("click", closePart);
     $("#pcOverlay").addEventListener("click", closePart);
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") { closeLightbox(); closePart(); closeCart(); closePriceModal(); closeCheck(); }
+      if (e.key === "Escape") { closeLightbox(); closePart(); closeDocs(); closeCart(); closePriceModal(); closeCheck(); }
     });
     $("#menuBtn").addEventListener("click", function () { $("#sidebar").classList.toggle("open"); });
     $("#homeBtn").addEventListener("click", function () { location.hash = "#/"; });

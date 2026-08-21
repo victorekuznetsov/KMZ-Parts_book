@@ -392,24 +392,52 @@ body.no-data .search { display: none; }
 .logo { min-width: 40px; }                 /* знак не сжимается никогда */
 
 .manual-btn.machine-site {
-  display: inline-block;                   /* ради text-overflow */
+  display: inline-block;
   line-height: 36px;
-  flex: 0 1 auto;
-  min-width: 0;
-  max-width: 420px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex: 0 0 auto;                          /* подпись короткая — не сжимаем */
+  white-space: nowrap;
 }
 .price-btn, .cart-btn { flex: 0 0 auto; }
 
 /* узкие окна: у кнопок остаются только значки (правило для 900px есть в
    styles.css, здесь — промежуточная ступень) */
-@media (max-width: 1400px) {
-  .manual-btn.machine-site { max-width: 220px; }
-}
 @media (max-width: 1150px) {
-  .manual-btn.machine-site { font-size: 0; padding: 0 12px; max-width: none; }
+  .manual-btn.machine-site { font-size: 0; padding: 0 12px; }
   .manual-btn.machine-site::before { content: "📖"; font-size: 16px; }
   .home-btn { font-size: 0; padding: 9px 11px; }
   .home-btn::before { content: "⌂"; font-size: 16px; }
 }
+
+/* ---------------------------------------------------------------------
+   Панель «Документы»: руководства машины и прежний офлайн-просмотрщик
+   --------------------------------------------------------------------- */
+.docs-group { margin-bottom: 18px; }
+.docs-group h3 {
+  margin: 0 0 8px; font-size: 13px; text-transform: uppercase;
+  letter-spacing: .4px; color: var(--muted); font-weight: 700;
+}
+.docs-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 12px; margin-bottom: 6px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface-2); color: var(--ink); text-decoration: none;
+  transition: border-color .15s, background .15s;
+}
+.docs-row:hover {
+  border-color: var(--accent-strong); background: var(--accent-soft);
+  text-decoration: none;
+}
+.docs-row .ico { font-size: 18px; flex: 0 0 auto; }
+.docs-row .txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.docs-row .txt b { font-size: 14px; font-weight: 600; }
+.docs-row .src { font-size: 11.5px; color: var(--muted); word-break: break-word; }
+.docs-row .go { color: var(--muted); flex: 0 0 auto; }
+.docs-row:hover .go { color: var(--accent-ink); }
+
+/* кнопка документов — это button, а не ссылка: выравниваем с остальными */
+button.manual-btn.machine-site { cursor: pointer; font-family: inherit; }
+
+/* кнопка «Документы» в шапке раздела выглядит как ссылка-чип */
+button.xref-link.docs-open { font: inherit; cursor: pointer; }
+/* на карточке машины документы перечисляются списком */
+.mcard-full + .mcard-full { margin-top: 4px; }
