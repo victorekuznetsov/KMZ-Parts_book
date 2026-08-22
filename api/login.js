@@ -39,7 +39,10 @@ export default async function handler(request) {
     exp = Math.min(exp, end);
   }
 
-  const token = await signToken({ u: user.u, r: user.role, exp: exp }, getSecret());
+  let secret;
+  try { secret = getSecret(); }
+  catch (e) { return json({ error: "Сервер не настроен: AUTH_SECRET не задан в Vercel" }, 500); }
+  const token = await signToken({ u: user.u, r: user.role, exp: exp }, secret);
   const maxAge = Math.max(0, exp - now);
   const cookie = COOKIE + "=" + encodeURIComponent(token) +
     "; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=" + maxAge;

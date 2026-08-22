@@ -10,16 +10,18 @@ const PBKDF2_ITERS = 120000;
 const enc = new TextEncoder();
 const dec = new TextDecoder();
 
-// The HMAC signing secret. On Vercel set AUTH_SECRET (Settings → Environment
-// Variables) — it overrides the committed bootstrap value below. Rotating it
-// invalidates every existing session. Generate one: node build/make_user.mjs secret
-const FALLBACK_SECRET = "iA9oKfmwNsaXmt8pnIkJy9EbGiGpUrdQdKX-m1Eo2Bo";
+// The HMAC signing secret. MUST be set on Vercel: Settings → Environment
+// Variables → AUTH_SECRET (generate one with `node build/make_user.mjs secret`).
+// There is deliberately no fallback value committed to the repo — if
+// AUTH_SECRET is missing, every login/session check fails closed (nobody
+// gets in) instead of falling back to a secret anyone reading this file
+// could also read. Rotating AUTH_SECRET invalidates every existing session.
 export function getSecret() {
   try {
     if (typeof process !== "undefined" && process.env && process.env.AUTH_SECRET)
       return process.env.AUTH_SECRET;
   } catch (e) {}
-  return FALLBACK_SECRET;
+  throw new Error("AUTH_SECRET is not set (Vercel → Settings → Environment Variables)");
 }
 
 export function b64urlEncode(bytes) {

@@ -25,7 +25,11 @@ export default async function middleware(request) {
   const cookie = request.headers.get("cookie") || "";
   const m = cookie.match(/(?:^|;\s*)kmz_auth=([^;]+)/);
   const token = m ? decodeURIComponent(m[1]) : "";
-  const claims = token ? await verifyToken(token, getSecret()) : null;
+  let claims = null;
+  if (token) {
+    try { claims = await verifyToken(token, getSecret()); }
+    catch (e) { claims = null; } // AUTH_SECRET missing -> fail closed, fall through to login
+  }
   if (claims) return cont();
 
   const url = new URL(request.url);
