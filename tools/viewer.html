@@ -212,6 +212,7 @@ td.addbtn{width:1%;padding-right:16px}
       <button id="prevu" title="Предыдущий узел (←)">‹</button>
       <button id="nextu" title="Следующий узел (→)">›</button>
       <button id="csvbtn" title="Скачать спецификацию узла в CSV">⬇ CSV</button>
+      <button id="docsbtn" title="Руководства по эксплуатации и обслуживанию">📖 Руководства</button>
       <button id="themebtn" title="Светлая/тёмная тема">◐</button>
       <button id="cartbtn" class="orderpill" title="Заказ (c)">Заказ<span class="badge" id="cartbadge" hidden>0</span></button>
     </div>
@@ -694,6 +695,7 @@ $('themebtn').onclick=function(){var r=document.documentElement;
   try{localStorage.setItem('kmz.theme',nxt);}catch(e){}};
 try{var th=localStorage.getItem('kmz.theme');if(th)document.documentElement.setAttribute('data-theme',th);}catch(e){}
 $('csvbtn').onclick=exportCSV;
+$('docsbtn').onclick=function(){location.href='Руководства.html';};
 $('xlsxall').onclick=exportAllXLS;
 $('prevu').onclick=function(){stepUnit(-1);};
 $('nextu').onclick=function(){stepUnit(1);};

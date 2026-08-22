@@ -1,0 +1,451 @@
+/* Надстройка единого каталога над styles.css: переключатель машин, вкладки
+   разделов, экран выбора моделей, карточка детали. Все цвета — через токены
+   темы из styles.css, поэтому блок работает и в светлой, и в тёмной теме. */
+
+/* --- machine switcher in the header --- */
+.machine-switch {
+  display: flex;
+  gap: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  padding: 3px;
+  border-radius: 10px;
+  margin: 0 6px;
+  flex: 0 0 auto;
+}
+.machine-switch button {
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font: 600 13px/1 Calibri, "Segoe UI", Arial, sans-serif;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s, color .15s;
+}
+.machine-switch button:hover { background: var(--surface); color: var(--ink); }
+.machine-switch button.active {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.manual-btn.machine-site { background: var(--accent-soft); }
+
+/* --- sidebar current-machine banner --- */
+.sidebar-machine {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  font: 13px/1.35 Calibri, "Segoe UI", Arial, sans-serif;
+  color: var(--ink-soft);
+}
+.sidebar-machine b { color: var(--ink); font-size: 14px; }
+.sidebar-machine .sm-sub { color: var(--muted); }
+
+/* --- machine chips used in cart / check results --- */
+.mchip {
+  display: inline-block;
+  font: 700 10px/1 Calibri, "Segoe UI", Arial, sans-serif;
+  letter-spacing: .4px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: var(--chip-bg);
+  color: var(--chip-ink);
+  vertical-align: middle;
+  margin-right: 6px;
+  text-transform: uppercase;
+}
+/* цвет машины назначается по её порядковому номеру (класс c0…c5) */
+.mchip.c0 { background: var(--m0-soft); color: var(--m0); }
+.mchip.c1 { background: var(--m1-soft); color: var(--m1); }
+.mchip.c2 { background: var(--m2-soft); color: var(--m2); }
+.mchip.c3 { background: var(--m3-soft); color: var(--m3); }
+.mchip.c4 { background: var(--m4-soft); color: var(--m4); }
+.mchip.c5 { background: var(--m5-soft); color: var(--m5); }
+
+.chk-scope {
+  margin: 4px 0 2px;
+  font: 12px/1.4 Calibri, "Segoe UI", Arial, sans-serif;
+  color: var(--muted);
+}
+.chk-machinecell { white-space: nowrap; }
+
+/* section-view instruction links get an accent */
+.xref-link.tomachine { background: var(--accent-soft); border-color: var(--accent-strong); color: var(--accent-ink); }
+
+@media (max-width: 900px) {
+  .machine-switch { order: 5; width: 100%; margin: 6px 0 0; justify-content: stretch; }
+  .machine-switch button { flex: 1; }
+}
+
+/* --- home / model-selection button --- */
+.home-btn {
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--ink-soft);
+  font: 600 13px/1 Calibri, "Segoe UI", Arial, sans-serif;
+  padding: 9px 13px;
+  border-radius: 9px;
+  cursor: pointer;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+.home-btn:hover { background: var(--accent-soft); color: var(--accent-ink); border-color: var(--accent-strong); }
+
+/* --- category tabs in the sidebar --- */
+.cat-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 10px 10px 8px;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.cat-tabs button {
+  flex: 1 1 auto;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--ink);
+  font: 600 12.5px/1 Calibri, "Segoe UI", Arial, sans-serif;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.cat-tabs button:hover { background: var(--chip-bg); }
+.cat-tabs button.active {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
+.engine-note {
+  padding: 16px 14px;
+  font: 13px/1.5 Calibri, "Segoe UI", Arial, sans-serif;
+  color: var(--ink-soft);
+}
+
+/* --- engine EPC iframe --- */
+.engine-frame {
+  width: 100%;
+  height: calc(100vh - 220px);
+  min-height: 520px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+/* --- breadcrumb links --- */
+.crumb-link { color: var(--accent-ink); text-decoration: none; }
+.crumb-link:hover { text-decoration: underline; }
+
+/* --- landing (model selection) --- */
+/* на экране выбора моделей ссылки конкретной машины и её поиск не показываем */
+body.on-landing .sidebar,
+body.on-landing .machine-site,
+body.on-landing .search { display: none; }
+body.on-landing .content { padding-top: 8px; }
+
+.landing { max-width: 1080px; margin: 0 auto; padding: 8px 4px 40px; }
+.landing-h h1 { font: 700 26px/1.2 Calibri, "Segoe UI", Arial, sans-serif; color: var(--ink); margin: 8px 0 4px; }
+.landing-h p { color: var(--ink-soft); font-size: 14.5px; line-height: 1.5; max-width: 780px; }
+.landing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  margin-top: 22px;
+}
+.mcard {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 18px 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.mcard-badge {
+  align-self: flex-start;
+  font: 800 18px/1 Calibri, "Segoe UI", Arial, sans-serif;
+  letter-spacing: .5px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  color: var(--bg);
+  background: var(--ink);
+}
+.mcard-badge.c0 { background: var(--m0); }
+.mcard-badge.c1 { background: var(--m1); }
+.mcard-badge.c2 { background: var(--m2); }
+.mcard-badge.c3 { background: var(--m3); }
+.mcard-badge.c4 { background: var(--m4); }
+.mcard-badge.c5 { background: var(--m5); }
+.mcard-sub { color: var(--ink-soft); font-size: 13.5px; line-height: 1.4; min-height: 34px; }
+.mcard-cats { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
+.mcard-cat {
+  text-decoration: none;
+  font: 600 13.5px/1 Calibri, "Segoe UI", Arial, sans-serif;
+  padding: 10px 14px;
+  border-radius: 9px;
+  color: var(--on-accent);
+  background: var(--accent);
+}
+.mcard-cat:hover { filter: brightness(.95); }
+.mcard-cat.cat-drive { background: var(--m0-soft); color: var(--m0); }
+.mcard-cat.cat-engine { background: var(--m2-soft); color: var(--m2); }
+.mcard-full {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--chip-ink);
+  text-decoration: none;
+}
+.mcard-full:hover { text-decoration: underline; }
+
+@media (max-width: 900px) {
+  .home-btn { padding: 8px 10px; font-size: 12px; }
+  .engine-frame { height: calc(100vh - 180px); }
+}
+
+/* --- logout button in the top contact bar --- */
+.contact-bar { position: relative; }
+.logout-btn {
+  margin-left: 14px;
+  border: 1px solid rgba(255,255,255,.35);
+  background: transparent;
+  color: inherit;
+  font: 600 12px/1 Calibri, "Segoe UI", Arial, sans-serif;
+  padding: 4px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.logout-btn:hover { background: rgba(255,255,255,.15); }
+
+/* ---------------------------------------------------------------------
+   Переключатель темы в шапке
+   --------------------------------------------------------------------- */
+.icon-btn {
+  flex: 0 0 auto;
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.icon-btn:hover { background: var(--surface-2); color: var(--ink); border-color: var(--line-strong); }
+.icon-btn .ico-sun { display: none; }
+.icon-btn .ico-moon { display: block; }
+:root[data-theme="dark"] .icon-btn .ico-sun { display: block; }
+:root[data-theme="dark"] .icon-btn .ico-moon { display: none; }
+
+/* ---------------------------------------------------------------------
+   Карточка детали (открывается кликом по номеру детали)
+   --------------------------------------------------------------------- */
+.pn-btn {
+  border: 0; padding: 0; background: none;
+  font: inherit; color: var(--accent-ink);
+  cursor: pointer; text-align: left;
+  border-bottom: 1px dashed currentColor;
+}
+.pn-btn:hover { color: var(--ink); }
+
+.part-card {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: min(560px, 100%);
+  display: flex; flex-direction: column;
+  background: var(--surface);
+  border-left: 1px solid var(--line);
+  box-shadow: var(--shadow-panel);
+  transform: translateX(100%);
+  transition: transform .22s ease;
+  z-index: 96;
+}
+.part-card.open { transform: none; }
+.pc-body { flex: 1; overflow: auto; padding: 16px 18px 28px; }
+
+.pc-gallery { margin-bottom: 14px; }
+.pc-main {
+  display: grid; place-items: center;
+  background: #fff; border: 1px solid var(--line); border-radius: 10px;
+  min-height: 180px; padding: 10px;
+}
+.pc-main img { max-width: 100%; max-height: 300px; cursor: zoom-in; }
+.pc-thumbs { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.pc-thumbs img {
+  width: 54px; height: 54px; object-fit: contain;
+  background: #fff; border: 1px solid var(--line); border-radius: 7px;
+  padding: 3px; cursor: pointer;
+}
+.pc-thumbs img.on { border-color: var(--accent-strong); box-shadow: 0 0 0 2px var(--accent-soft); }
+
+.pc-name { margin-bottom: 12px; }
+.pc-name .zh { font-size: 16px; font-weight: 600; color: var(--ink); }
+.pc-name .en { font-size: 13.5px; color: var(--ink-soft); }
+.pc-name .ru { font-size: 13.5px; color: var(--accent-ink); }
+.pc-name .muted { color: var(--muted); }
+
+.pc-order {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; margin-bottom: 14px;
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px;
+}
+.pc-order label { font-size: 13px; color: var(--muted); }
+.pc-order .need { width: 84px; }
+.pc-order .btn { margin-left: auto; flex: 0 0 auto; }
+
+.pc-block { margin-bottom: 16px; }
+.pc-block h3 {
+  margin: 0 0 8px; font-size: 13px; text-transform: uppercase;
+  letter-spacing: .4px; color: var(--muted); font-weight: 700;
+}
+.pc-count {
+  display: inline-block; min-width: 18px; padding: 0 6px; margin-left: 4px;
+  background: var(--accent-soft); color: var(--accent-ink);
+  border-radius: 9px; font-size: 11.5px; letter-spacing: 0;
+}
+.pc-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.pc-table th, .pc-table td {
+  padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top;
+}
+.pc-table th { width: 46%; color: var(--muted); font-weight: 600; }
+.pc-table td { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.pc-sup-row {
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 6px 8px; border-bottom: 1px solid var(--line); font-size: 13px;
+}
+.pc-sup-row span { color: var(--muted); }
+.pc-sup-row b { font-variant-numeric: tabular-nums; }
+
+.pc-used { display: flex; flex-direction: column; gap: 4px; }
+.pc-used-row {
+  display: flex; align-items: baseline; gap: 8px;
+  padding: 7px 8px; border-radius: 8px; font-size: 13px;
+  color: var(--ink); text-decoration: none;
+  border: 1px solid transparent;
+}
+.pc-used-row:hover { background: var(--surface-2); border-color: var(--line); text-decoration: none; }
+.pc-used-row .mm { font-weight: 700; color: var(--accent-ink); flex: 0 0 auto; }
+.pc-used-row .cc { color: var(--muted); font-variant-numeric: tabular-nums; flex: 0 0 auto; }
+.pc-used-row .nn { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pc-used-row .rr { color: var(--muted); font-size: 12px; flex: 0 0 auto; }
+
+/* ---------------------------------------------------------------------
+   Экран выбора моделей: счётчик наполнения каталога
+   --------------------------------------------------------------------- */
+.mcard-stat {
+  margin: 6px 0 2px; font-size: 12.5px; color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------
+   Экран «каталог ещё не заполнен»
+   --------------------------------------------------------------------- */
+/* пока данных нет, инструменты каталога прятать: работать им не с чем */
+body.no-data .sidebar,
+body.no-data .machine-switch,
+body.no-data .machine-site,
+body.no-data .home-btn,
+body.no-data .price-btn,
+body.no-data .cart-btn,
+body.no-data .search { display: none; }
+.nodata-steps {
+  max-width: 780px; margin-top: 8px;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 12px; padding: 18px 22px; box-shadow: var(--shadow);
+}
+.nodata-steps ol { margin: 0; padding-left: 20px; }
+.nodata-steps li { margin-bottom: 10px; line-height: 1.55; }
+.nodata-steps code {
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: 5px; padding: 1px 5px; font-size: 12.5px;
+}
+.nodata-note { color: var(--muted); margin: 12px 0 0; }
+
+/* ---------------------------------------------------------------------
+   Чертежи в тёмной теме: линейная графика печатается по белому,
+   поэтому подложка остаётся светлой, а рамка — тематической.
+   --------------------------------------------------------------------- */
+:root[data-theme="dark"] .drawing-wrap .stage,
+:root[data-theme="dark"] .drawing-wrap img { background: #fff; }
+
+@media (max-width: 900px) {
+  .part-card { width: 100%; }
+}
+
+/* пометка в корзине: цена взята из действующего прайса, а не из прайса
+   на согласование */
+.cline .each-src {
+  display: inline-block; margin-left: 4px; padding: 0 5px;
+  background: var(--chip-bg); color: var(--chip-ink);
+  border-radius: 8px; font-size: 10.5px; font-weight: 700;
+}
+
+/* ---------------------------------------------------------------------
+   Шапка: не даём ей переполняться. Машин у КМЗ три, а кнопка родных
+   материалов несёт длинную подпись — без этого «Заказ» уезжал за правый
+   край окна, а знак «Развитие» схлопывался до нуля и обрезался.
+   --------------------------------------------------------------------- */
+.logo { min-width: 40px; }                 /* знак не сжимается никогда */
+
+.manual-btn.machine-site {
+  display: inline-block;
+  line-height: 36px;
+  flex: 0 0 auto;                          /* подпись короткая — не сжимаем */
+  white-space: nowrap;
+}
+.price-btn, .cart-btn { flex: 0 0 auto; }
+
+/* узкие окна: у кнопок остаются только значки (правило для 900px есть в
+   styles.css, здесь — промежуточная ступень) */
+@media (max-width: 1150px) {
+  .manual-btn.machine-site { font-size: 0; padding: 0 12px; }
+  .manual-btn.machine-site::before { content: "📖"; font-size: 16px; }
+  .home-btn { font-size: 0; padding: 9px 11px; }
+  .home-btn::before { content: "⌂"; font-size: 16px; }
+}
+
+/* ---------------------------------------------------------------------
+   Панель «Документы»: руководства машины и прежний офлайн-просмотрщик
+   --------------------------------------------------------------------- */
+.docs-group { margin-bottom: 18px; }
+.docs-group h3 {
+  margin: 0 0 8px; font-size: 13px; text-transform: uppercase;
+  letter-spacing: .4px; color: var(--muted); font-weight: 700;
+}
+.docs-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 12px; margin-bottom: 6px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface-2); color: var(--ink); text-decoration: none;
+  transition: border-color .15s, background .15s;
+}
+.docs-row:hover {
+  border-color: var(--accent-strong); background: var(--accent-soft);
+  text-decoration: none;
+}
+.docs-row .ico { font-size: 18px; flex: 0 0 auto; }
+.docs-row .txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.docs-row .txt b { font-size: 14px; font-weight: 600; }
+.docs-row .src { font-size: 11.5px; color: var(--muted); word-break: break-word; }
+.docs-row .go { color: var(--muted); flex: 0 0 auto; }
+.docs-row:hover .go { color: var(--accent-ink); }
+
+/* кнопка документов — это button, а не ссылка: выравниваем с остальными */
+button.manual-btn.machine-site { cursor: pointer; font-family: inherit; }
+
+/* кнопка «Документы» в шапке раздела выглядит как ссылка-чип */
+button.xref-link.docs-open { font: inherit; cursor: pointer; }
+/* на карточке машины документы перечисляются списком */
+.mcard-full + .mcard-full { margin-top: 4px; }
+
+/* ссылка «найти узел в руководствах» рядом с кнопкой документов */
+.xref-link.tomanual {
+  background: var(--chip-bg); border-color: var(--line-strong); color: var(--chip-ink);
+}
+.xref-link.tomanual:hover {
+  border-color: var(--accent-strong); color: var(--accent-ink); text-decoration: none;
+}
