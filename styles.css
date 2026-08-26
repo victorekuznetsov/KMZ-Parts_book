@@ -504,3 +504,6 @@ tr.pn-flash > td { animation: pnflash 2.2s ease-out; }
 /* выбранная из поиска деталь остаётся подсвеченной, чтобы её не искать заново */
 tr.pn-selected > td { background: rgba(62,240,175,.16); }
 tr.pn-selected > td:first-child { box-shadow: inset 3px 0 0 0 var(--accent-strong); }
+/* Строка результата поиска — щелчок ведёт в каталог и подсвечивает позицию */
+table.parts tr.jumpable { cursor: pointer; }
+table.parts tr.jumpable:hover > td { background: rgba(62,240,175,.08); }

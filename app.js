@@ -530,7 +530,9 @@
     return keyed.map(function (k) { return k.p; });
   }
 
-  function renderParts(parts) {
+  /* jump — переход из списка результатов в сам каталог. Если он задан, строки
+     кликабельны: щелчок открывает раздел и подсвечивает там эту позицию. */
+  function renderParts(parts, jump) {
     parts = sortByPos(parts);
     var cur3 = currencyOf(cur);
     var pw = el("div", "parts-wrap");
@@ -547,13 +549,13 @@
       "<th></th>" +
       "</tr></thead>";
     var tb = el("tbody");
-    parts.forEach(function (p) { tb.appendChild(renderRow(p)); });
+    parts.forEach(function (p) { tb.appendChild(renderRow(p, jump)); });
     table.appendChild(tb);
     pw.appendChild(table);
     return pw;
   }
 
-  function renderRow(p) {
+  function renderRow(p, jump) {
     var pr = p.pn ? priceOf(p.pn) : null;
     var isKit = isKitPart(p, pr);
     var cls = [];
@@ -561,6 +563,15 @@
     if (isKit) cls.push("row-kit");
     var tr = el("tr", cls.join(" "));
     if (p.pn) tr.dataset.pn = p.pn;
+    if (jump && p.pn) {
+      tr.classList.add("jumpable");
+      tr.title = "Перейти к этой позиции в каталоге";
+      tr.addEventListener("click", function (e) {
+        // клики по номеру, полю «нужно» и кнопке «+» оставляем им
+        if (e.target.closest("input, button, details")) return;
+        jump(p);
+      });
+    }
     var pnCell;
     if (p.pn) {
       var xref = pr && pr.x ? '<span class="xref">↔ ' + esc(pr.x) + "</span>" : "";
@@ -653,11 +664,13 @@
       var s = sectionByCode[code];
       var block = el("div", "result-sec");
       var rsh = el("div", "rsh", esc(code) + " · " + esc(secName(s)));
-      rsh.addEventListener("click", function () {
+      var goSec = function (pn) {
+        focusPN = pn || null;
         location.hash = catHash(cur, chapterCategory(cur, s ? s.chapter : ""), "s/" + code);
-      });
+      };
+      rsh.addEventListener("click", function () { goSec(null); });
       block.appendChild(rsh);
-      block.appendChild(renderParts(bySec[code]));
+      block.appendChild(renderParts(bySec[code], function (p) { goSec(p.pn); }));
       content.appendChild(block);
     });
     if (hits.length > 600) content.appendChild(el("p", "sub", "Показаны первые 600 из " + hits.length + " — уточните запрос."));
@@ -694,9 +707,13 @@
       var s = sectionByCode[code];
       var block = el("div", "result-sec");
       var rsh = el("div", "rsh", esc(code) + " · " + esc(secName(s)));
-      rsh.addEventListener("click", function () { location.hash = catHash(cur, curCat, "s/" + code); });
+      var goSec = function (pn) {
+        focusPN = pn || null;
+        location.hash = catHash(cur, curCat, "s/" + code);
+      };
+      rsh.addEventListener("click", function () { goSec(null); });
       block.appendChild(rsh);
-      block.appendChild(renderParts(bySec[code]));
+      block.appendChild(renderParts(bySec[code], function (p) { goSec(p.pn); }));
       content.appendChild(block);
     });
     window.scrollTo(0, 0);
