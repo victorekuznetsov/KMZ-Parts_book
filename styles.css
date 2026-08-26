@@ -502,7 +502,9 @@ tr.pn-flash > td { animation: pnflash 2.2s ease-out; }
   100% { background: transparent; }
 }
 /* выбранная из поиска деталь остаётся подсвеченной, чтобы её не искать заново */
-tr.pn-selected > td { background: rgba(62,240,175,.16); }
+/* !important — иначе наведение мыши (table.parts tr:hover td) перебивает
+   подсветку по специфичности, и выбранная строка гаснет под курсором */
+tr.pn-selected > td { background: rgba(62,240,175,.16) !important; }
 tr.pn-selected > td:first-child { box-shadow: inset 3px 0 0 0 var(--accent-strong); }
 /* Строка результата поиска — щелчок ведёт в каталог и подсвечивает позицию */
 table.parts tr.jumpable { cursor: pointer; }
